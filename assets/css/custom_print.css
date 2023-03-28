@@ -1,0 +1,291 @@
+html,body{min-height:100%}
+.layout-boxed html,.layout-boxed body{height:100%}body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-family:'Roboto','Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif;overflow-x:hidden;overflow-y:auto}
+
+hr {
+  margin-top: 0px;
+  border: 1px solid #000000;
+}
+.double-underline {
+  border-bottom: 4px double;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+ .box-report {
+      margin-left: 0px;
+      margin-right: 0px;
+      text-align: center;
+  }
+
+
+.report-logo img {
+    width: 140px;
+    padding-left: 20px;
+    padding-right: 30px;
+}   
+.report-title {
+  text-align: left;
+}   
+.report-title1 {
+  padding-top: 5px;
+  padding-bottom: 10px;
+  text-align: left;
+  font-size: 12pt;
+  font-weight: bold;
+}   
+.report-title2 {
+  text-align: left;
+  font-size: 11pt;
+  font-weight: bold;
+}   
+.report-title3 {
+  text-align: left;
+  font-size: 10pt;
+  font-weight: bold;
+}   
+.report-title4 {
+  text-align: left;
+  font-size: 9pt;
+  font-weight: bold;
+}
+  
+.table-report-title {
+  width: 95%;
+  max-width: 100%;
+  margin-bottom: 0px;
+    margin-top: 10px;
+/*    border-top: 2px solid #f39c12;*/
+}
+.table-report-title > thead > tr > th,
+.table-report-title > tbody > tr > th,
+.table-report-title > tfoot > tr > th,
+.table-report-title > thead > tr > td,
+.table-report-title > tbody > tr > td,
+.table-report-title > tfoot > tr > td {
+  padding: 3px;
+  line-height: 1.42857143;
+  vertical-align: top;
+  border: 0px;
+  font-weight: bold;
+}
+.table-report-title > thead > tr > th {
+  vertical-align: bottom;
+  border-bottom: 0px;
+}
+.table-report-title > caption + thead > tr:first-child > th,
+.table-report-title > colgroup + thead > tr:first-child > th,
+.table-report-title > thead:first-child > tr:first-child > th,
+.table-report-title > caption + thead > tr:first-child > td,
+.table-report-title > colgroup + thead > tr:first-child > td,
+.table-report-title > thead:first-child > tr:first-child > td {
+  border-top: 0px;
+}
+.table-report-title > tbody + tbody {
+  border-top: 0px;
+}
+
+.table-report-title > tbody > tr > td.kodex{
+  width: 11%;
+}
+.table-report-title > tbody > tr > td.kodex2{
+  width: 50%;
+}
+
+@media (max-width:768px){    
+    .table-report-title > tbody > tr > td.kodex{
+      width: 15%;
+    }
+    .table-report-title > tbody > tr > td.kodex2{
+      width: 30%;
+    }
+}
+    
+    
+.table-report {
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 10px;
+}
+.table-report > thead > tr > th,
+.table-report > tbody > tr > th,
+.table-report > tfoot > tr > th,
+.table-report > thead > tr > td,
+.table-report > tbody > tr > td,
+.table-report > tfoot > tr > td {
+  padding: 4px;
+  line-height: 1.42857143;
+  vertical-align: top;
+  /* border: 1px solid #ddd; */
+}
+.table-report > thead > tr > th {
+  vertical-align: middle;
+  border-top: 1px solid #FF0000;
+  border-bottom: 1px solid #FF0000;
+    text-align: left;
+    /* background-color: #D9E3DD; */
+}
+.table-report > caption + thead > tr:first-child > td,
+.table-report > colgroup + thead > tr:first-child > td,
+.table-report > thead:first-child > tr:first-child > td {
+  border-top: 2px solid #ddd;
+}
+.table-report > tbody + tbody {
+  border-top: 2px solid #ddd;
+}
+
+.table-report-akhir {
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 10px;
+    border-bottom: 1px solid #FF0000;
+}
+.table-report-akhir > thead > tr > th,
+.table-report-akhir > tbody > tr > th,
+.table-report-akhir > tfoot > tr > th,
+.table-report-akhir > thead > tr > td,
+.table-report-akhir > tbody > tr > td,
+.table-report-akhir > tfoot > tr > td {
+  padding: 3px;
+  line-height: 1.42857143;
+  vertical-align: top;
+  border: 0px;
+  font-weight: bold;
+}
+
+.table-report-neraca {
+  width: 100%;
+  max-width: 100%;
+  
+}
+.table-report-neraca > thead > tr > th,
+.table-report-neraca > tbody > tr > th,
+.table-report-neraca > tfoot > tr > th,
+.table-report-neraca > thead > tr > td,
+.table-report-neraca > tbody > tr > td,
+.table-report-neraca > tfoot > tr > td {
+  padding: 8px;
+  line-height: 1.42857143;
+  vertical-align: top;
+  border: 1px solid #ddd;
+}
+.table-report-neraca > thead > tr > th {
+  vertical-align: middle;
+  border-bottom: 2px solid #ddd;
+    text-align: center;
+    background-color: #D9E3DD;
+}
+.table-report-neraca > caption + thead > tr:first-child > th,
+.table-report-neraca > colgroup + thead > tr:first-child > th,
+.table-report-neraca > thead:first-child > tr:first-child > th,
+.table-report-neraca > caption + thead > tr:first-child > td,
+.table-report-neraca > colgroup + thead > tr:first-child > td,
+.table-report-neraca > thead:first-child > tr:first-child > td {
+  border-top: 1px solid #ddd;
+}
+.table-report-neraca > tbody + tbody {
+  border-top: 1px solid #ddd;
+}
+
+.table-report-neraca-akhir {
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 10px;
+    border-bottom: 2px solid #f39c12;
+}
+.table-report-neraca-akhir > thead > tr > th,
+.table-report-neraca-akhir > tbody > tr > th,
+.table-report-neraca-akhir > tfoot > tr > th,
+.table-report-neraca-akhir > thead > tr > td,
+.table-report-neraca-akhir > tbody > tr > td,
+.table-report-neraca-akhir > tfoot > tr > td {
+  padding: 3px;
+  line-height: 1.42857143;
+  vertical-align: top;
+  border: 0px;
+  font-weight: bold;
+}
+
+.table-report-neraca > tbody > tr > td.no_border_top {
+    border-top: 0px;
+}
+
+.table-report-neraca > tbody > tr > td.no_border_bottom {
+    border-bottom: 0px;
+}
+.table-report-neraca > tbody > tr > td.no_border_left {
+    border-left: 0px;
+}
+.table-report-neraca > tbody > tr > td.no_border_right {
+    border-right: 0px;
+}
+.table-report > tbody > tr > td.xnext-30 {
+    padding-left: 30px;
+}
+.table-report > tbody > tr > td.xnext-60 {
+    padding-left: 60px;
+}
+.table-report > tbody > tr > td.xnext-90 {
+    padding-left: 90px;
+}
+.table-report > tbody > tr > td.xnext-120 {
+    padding-left: 120px;
+}
+.table-report > tbody > tr > td.xnext-50 {
+  padding-left: 50px;
+}
+.table-report > tbody > tr > td.xnext-100 {
+  padding-left: 100px;
+}
+.table-report > tbody > tr > td.xnext-150 {
+  padding-left: 150px;
+}
+.table-report > tbody > tr > td.xnext-200 {
+  padding-left: 200px;
+}
+
+.xcenter {
+    text-align: center;
+}
+.xleft {
+    text-align: left;
+}
+.xright {
+    text-align: right;
+}
+.xbold {
+    font-weight: bold;
+}
+
+.xbg-grey {
+    background-color: #ccc;
+}
+
+
+.table > tbody > tr > td .pdl-1 {
+      padding-left: 0px;
+    }
+    .pdl-2 {
+      padding-left: 20px;
+    }
+    .pdl-3 {
+      padding-left: 40px;
+    }
+    .pdl-4 {
+      padding-left: 60px;
+    }
+    .pdl-5 {
+      padding-left: 80px;
+    }
+    .pdl-6 {
+      padding-left: 100px;
+    }
+
+.pad3 {
+  padding: 3px;
+}
+.pad4 {
+  padding: 4px;
+}
+.pad5 {
+  padding: 5px;
+}
