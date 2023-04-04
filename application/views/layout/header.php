@@ -96,7 +96,7 @@
             <a href="#!" class="b-brand">
                 <!-- ========   change your logo hear   ============ -->
                 <img src="<?php echo base_url(); ?>assets/images/simkatmuh-logo.jpg" height="28px" alt="" class="logo"> 
-                <h3 style="margin-top:10px;color:#fff;">SIMKATMUH</h3>
+                <h3 style="margin-top:10px;color:#fff;">SIPPMU</h3>
             </a>
             <a href="#!" class="mob-toggler">
                 <i class="feather icon-more-vertical"></i>

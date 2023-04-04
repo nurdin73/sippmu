@@ -45,6 +45,13 @@ class Cabang extends Admin_Controller {
         echo json_encode($result);
     }
 
+    function get_all_data()
+    {
+        $filter = $this->input->get("search");
+        $result = $this->cabang_model->getData(null, $filter);
+        echo json_encode($result);
+    }
+
     public function add() {
         if(!$this->rbac->hasPrivilege('master_cabang', 'can_add')){
             access_denied();

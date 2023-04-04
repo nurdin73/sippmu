@@ -57,14 +57,17 @@ class Cabang_model extends CI_model {
         return $this->datatables->generate();
     }
 
-    function getData($id = null) {
+    function getData($id = null, $filter = null) {
 
         if (isset($id)) {
 
             $query = $this->db->where("id", $id)->get('m_cabang');
             return $query->row_array();
         } else {
-
+            if($filter) {
+                // $this->db->like('nama', $filter);
+                $this->db->where("nama ilike", "%$filter%");
+            }
             $query = $this->db->get("m_cabang");
             return $query->result_array();
         }

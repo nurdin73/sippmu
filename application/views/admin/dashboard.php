@@ -2,7 +2,7 @@
 <div class="row box-dashboard">
     <div class="col-lg-7 col-md-12">
         <!-- support-section start -->
-        <div class="row">
+        <!-- <div class="row">
             <div class="col-sm-6">
                 <div class="card support-bar overflow-hidden">
                     <div class="card-body pb-0">
@@ -55,12 +55,12 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
         <!-- support-section end -->
     </div>
     <div class="col-lg-5 col-md-12">
         <!-- page statustic card start -->
-        <div class="row">
+        <!-- <div class="row">
             <div class="col-sm-6">
                 <div class="card">
                     <div class="card-body">
@@ -161,12 +161,12 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
         <!-- page statustic card end -->
     </div>
     
     <!-- seo start -->
-    <div class="col-xl-4 col-md-12">
+    <!-- <div class="col-xl-4 col-md-12">
         <div class="card">
             <div class="card-body">
                 <div class="row align-items-center">
@@ -210,7 +210,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
     <!-- seo end -->
 
 </div>
@@ -218,6 +218,6 @@
 
 <script src="<?php echo base_url(); ?>assets/js/menu-setting.min.js"></script>
 <!-- Apex Chart -->
-<script src="<?php echo base_url(); ?>assets/js/plugins/apexcharts.min.js"></script>
+<!-- <script src="<?php echo base_url(); ?>assets/js/plugins/apexcharts.min.js"></script> -->
 <!-- custom-chart js -->
-<script src="<?php echo base_url(); ?>assets/js/pages/dashboard-main.js"></script>
+<!-- <script src="<?php echo base_url(); ?>assets/js/pages/dashboard-main.js"></script> -->
