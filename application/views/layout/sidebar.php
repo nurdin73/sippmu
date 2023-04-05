@@ -300,6 +300,14 @@
 
                                             <?php
                                         }
+
+                                        if ($this->rbac->hasPrivilege('master_jabatan', 'can_view')) {
+                                            ?>
+                                            <li class="<?php echo set_Submenu('master/jabatan'); ?>"><a href="<?php echo base_url(); ?>master/jabatan"> Jabatan</a></li>
+
+                                            <?php
+                                        }
+
                                         if ($this->rbac->hasPrivilege('master_program', 'can_view')) {
                                             ?>
                                             <!-- <li class="<?php echo set_Submenu('master/program'); ?>"><a href="<?php echo base_url(); ?>master/program"> <?php echo $this->lang->line('program'); ?></a></li> -->

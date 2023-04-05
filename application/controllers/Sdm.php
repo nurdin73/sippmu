@@ -80,6 +80,7 @@ class Sdm extends Admin_Controller {
     function get($id)
     {
         $find = $this->sdm_model->get($id);
+        header('Content-Type: application/json');
         echo json_encode($find);
     }
 

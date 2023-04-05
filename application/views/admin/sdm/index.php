@@ -73,13 +73,15 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="jabatan">Jabatan</label>
-                        <input type="text" name="jabatan" class="form-control">
-                    </div>
-
-                    <div class="form-group">
                         <label for="unit_kerja">Unit Kerja</label>
                         <select name="unit_kerja" class="form-control select2 w-100 unit_kerja" style="witdh: 100%">
+                            <option value="">Pilih</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="jabatan">Jabatan</label>
+                        <select name="jabatan" class="form-control select2 w-100 jabatan" style="witdh: 100%">
                             <option value="">Pilih</option>
                         </select>
                     </div>
@@ -181,14 +183,17 @@
                         <input type="number" name="nbm" class="form-control">
                     </div>
 
-                    <div class="form-group">
-                        <label for="jabatan">Jabatan</label>
-                        <input type="text" name="jabatan" class="form-control">
-                    </div>
-
+                    
                     <div class="form-group">
                         <label for="unit_kerja">Unit Kerja</label>
                         <select name="unit_kerja" class="form-control select2 w-100 unit_kerja" style="witdh: 100%">
+                            <option value="">Pilih</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="jabatan">Jabatan</label>
+                        <select name="jabatan" class="form-control select2 w-100 jabatan" style="witdh: 100%">
                             <option value="">Pilih</option>
                         </select>
                     </div>
@@ -280,8 +285,41 @@
 
         getData()
 
-        
+        // getJabatan();
+        $('.jabatan').attr('disabled', true);
+        $('.unit_kerja').on('select2:select', function(e) {
+            const val = e.target.value;
+            $('.jabatan').val('').trigger('change');
+            getJabatan(val);
+            $('.jabatan').attr('disabled', false);
+        })
     });
+
+    function getJabatan(unit = null) {
+        $('.jabatan').select2({
+            width:'100%',
+            ajax: {
+                url: "<?= site_url('master/jabatan/ajax') ?>",
+                dataType: 'json',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        unit: unit
+                    }
+                },
+                processResults: function(response) {
+                    return {
+                        results: response.map(r => {
+                            return {
+                                text: r.nama,
+                                id: r.id
+                            }
+                        })
+                    }
+                }
+            }
+        })
+    }
     
     function getCabang() {
 
@@ -457,8 +495,10 @@
                 $('#editForm input[name=hp]').val(response.sdm_hp)
                 $('#editForm textarea[name=alamat]').val(response.sdm_alamat)
                 // $('#editForm select[name=unit_kerja]').val(response.uk_id).trigger('change')
-                const option = new Option(`${response.kode}-${response.nama}`, response.uk_id, true, true);
+                const option = new Option(response.unit_kerja, response.unit_id, true, true);
                 $('#editForm select[name=unit_kerja]').append(option).trigger('change')
+                const option2 = new Option(response.jabatan, response.jabatan_id, true, true);
+                $('#editForm select[name=jabatan]').append(option2).trigger('change').attr('disabled', false)
                 if(response.status == 'f') {
                     $('#editForm select[name=status]').val('false').trigger('change')
                 }
