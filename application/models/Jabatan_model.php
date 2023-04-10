@@ -40,12 +40,23 @@ class Jabatan_model extends CI_Model
         return $query->result_array();
     }
 
+    function jabatanByUnit($id, $filter = null)
+    {
+        $this->db->where('id_unit', $id);
+        $this->db->where('is_deleted', false);
+        $this->db->where('is_active', true);
+        if($filter) $this->db->where("nama ilike", "%$filter%");
+        $query = $this->db->get($this->table);
+        return $query->result_array();
+    }
+
     public function create($data)
     {
         $this->db->insert($this->table, $data);
         $jabatan_id = $this->db->insert_id();
         return $jabatan_id;
     }
+    
 
     public function update($id, $data)
     {

@@ -1,8 +1,10 @@
 <?php
 
-class Sdm extends Admin_Controller {
-    
-    function __construct() {
+class Sdm extends Admin_Controller
+{
+
+    function __construct()
+    {
         parent::__construct();
         $this->load->model('sdm_model');
     }
@@ -13,7 +15,7 @@ class Sdm extends Admin_Controller {
         $role = $this->customlib->getStaffRole();
         $role_id = json_decode($role)->id;
         $userid = $this->customlib->getStaffID();
-        
+
         $tot_roles = $this->role_model->get();
         foreach ($tot_roles as $key => $value) {
             if ($value["id"] != 1) {
@@ -39,7 +41,7 @@ class Sdm extends Admin_Controller {
 
     function insert()
     {
-        if(!$this->rbac->hasPrivilege('sdm', 'can_view')){
+        if (!$this->rbac->hasPrivilege('sdm', 'can_view')) {
             access_denied();
         }
         $this->form_validation->set_rules('nama', 'Nama', 'required');
@@ -48,13 +50,13 @@ class Sdm extends Admin_Controller {
         $this->form_validation->set_rules('tanggal_lahir', 'Nama', 'required');
         $this->form_validation->set_rules('ttd', 'Status Tanda tangan', 'required');
 
-        if($this->form_validation->run() == false) {
+        if ($this->form_validation->run() == false) {
             $this->session->set_flashdata('message', "<div class='alert alert-danger'>" . validation_errors() . "</div>");
             redirect('sdm');
         } else {
-            $data = $this->input->post(['nama', 'nbm', 'unit_kerja', 'tanggal_lahir', 'telepon', 'hp', 'alamat', 'ttd', 'jabatan', 'tempat_lahir', 'status']);
+            $data = $this->input->post(['nama', 'nbm', 'unit_kerja', 'tanggal_lahir', 'telepon', 'hp', 'alamat', 'ttd', 'tempat_lahir', 'status']);
             $attr['sdm_nama'] = $data['nama'];
-            $attr['sdm_jabatan'] = $data['jabatan'];
+            $attr['sdm_jabatan'] = null;
             $attr['sdm_alamat'] = $data['alamat'];
             $attr['sdm_phone'] = $data['telepon'];
             $attr['sdm_hp'] = $data['hp'];
@@ -67,14 +69,13 @@ class Sdm extends Admin_Controller {
             $attr['create_userid'] = $this->customlib->getStaffID();
             $attr['update_date'] = time();
             $attr['update_userid'] = $this->customlib->getStaffID();
-            $attr['status'] = $data['status'];
+            $attr['status'] = $data['status'] ?? false;
             $this->sdm_model->create($attr);
 
             $this->session->set_flashdata('message', '<div class="alert alert-success">Sdm berhasil dibuat</div>');
             redirect('sdm');
             // echo json_encode($data);
         }
-
     }
 
     function get($id)
@@ -84,9 +85,24 @@ class Sdm extends Admin_Controller {
         echo json_encode($find);
     }
 
+    function sdmByUnit($id)
+    {
+        $results = $this->sdm_model->sdmByUnit($id);
+        header('Content-Type: application/json');
+        echo $results;
+    }
+
+    public function all()
+    {
+        $filter = $this->input->get('search');
+        $results = $this->sdm_model->all($filter);
+        header('Content-Type: application/json');
+        echo json_encode($results);
+    }
+
     public function update($id)
     {
-        if(!$this->rbac->hasPrivilege('sdm', 'can_view')){
+        if (!$this->rbac->hasPrivilege('sdm', 'can_view')) {
             access_denied();
         }
         $this->form_validation->set_rules('nama', 'Nama', 'required');
@@ -94,13 +110,13 @@ class Sdm extends Admin_Controller {
         $this->form_validation->set_rules('unit_kerja', 'Unit Kerja', 'required');
         $this->form_validation->set_rules('tanggal_lahir', 'Nama', 'required');
         $this->form_validation->set_rules('ttd', 'Status Tanda tangan', 'required');
-        if($this->form_validation->run() == false) {
+        if ($this->form_validation->run() == false) {
             $this->session->set_flashdata('message', "<div class='alert alert-danger'>" . validation_errors() . "</div>");
             redirect('sdm');
         }
-        $data = $this->input->post(['nama', 'nbm', 'unit_kerja', 'tanggal_lahir', 'telepon', 'hp', 'alamat', 'ttd', 'jabatan', 'tempat_lahir', 'status']);
+        $data = $this->input->post(['nama', 'nbm', 'unit_kerja', 'tanggal_lahir', 'telepon', 'hp', 'alamat', 'ttd', 'tempat_lahir', 'status']);
         $attr['sdm_nama'] = $data['nama'];
-        $attr['sdm_jabatan'] = $data['jabatan'];
+        $attr['sdm_jabatan'] = null;
         $attr['sdm_alamat'] = $data['alamat'];
         $attr['sdm_phone'] = $data['telepon'];
         $attr['sdm_hp'] = $data['hp'];
@@ -111,7 +127,7 @@ class Sdm extends Admin_Controller {
         $attr['uk_id'] = $data['unit_kerja'];
         $attr['update_date'] = time();
         $attr['update_userid'] = $this->customlib->getStaffID();
-        $attr['status'] = $data['status'];
+        $attr['status'] = $data['status'] ?? false;
 
         $this->sdm_model->update($id, $attr);
 
@@ -121,7 +137,7 @@ class Sdm extends Admin_Controller {
 
     function destroy($id)
     {
-        if(!$this->sdm_model->get($id)) {
+        if (!$this->sdm_model->get($id)) {
             $this->session->set_flashdata('message', '<div class="alert alert-error">Sdm tidak ditemukan</div>');
             redirect('sdm');
         }
@@ -129,5 +145,4 @@ class Sdm extends Admin_Controller {
         $this->session->set_flashdata('message', '<div class="alert alert-success">Sdm berhasil dihapus</div>');
         redirect('sdm');
     }
-
 }

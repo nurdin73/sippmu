@@ -2,7 +2,8 @@
 
 class Jabatan extends Admin_Controller
 {
-    function __construct() {
+    function __construct()
+    {
         parent::__construct();
         $this->load->model('jabatan_model');
     }
@@ -13,7 +14,7 @@ class Jabatan extends Admin_Controller
         $role = $this->customlib->getStaffRole();
         $role_id = json_decode($role)->id;
         $userid = $this->customlib->getStaffID();
-        
+
         $tot_roles = $this->role_model->get();
         foreach ($tot_roles as $key => $value) {
             if ($value["id"] != 1) {
@@ -42,7 +43,7 @@ class Jabatan extends Admin_Controller
     {
         $filter = $this->input->get('search');
         $unit = $this->input->get('unit');
-        $results = $this->jabatan_model->getData($unit, $filter); 
+        $results = $this->jabatan_model->getData($unit, $filter);
         header('Content-Type: application/json');
         echo json_encode($results);
     }
@@ -50,28 +51,36 @@ class Jabatan extends Admin_Controller
     function get($id)
     {
         $find = $this->jabatan_model->get($id);
-        if(!$find) header("HTTP/1.1 404 Not Found");
-        if($find){
+        if (!$find) header("HTTP/1.1 404 Not Found");
+        if ($find) {
             header('Content-Type: application/json');
             echo json_encode($find);
         }
     }
 
+    public function unit($id)
+    {
+        $filter = $this->input->get('search') ?? null;
+        $results = $this->jabatan_model->jabatanByUnit($id, $filter);
+        header('Content-Type: application/json');
+        echo json_encode($results);
+    }
+
     function insert()
     {
-        if(!$this->rbac->hasPrivilege('master_jabatan', 'can_view')){
+        if (!$this->rbac->hasPrivilege('master_jabatan', 'can_view')) {
             access_denied();
         }
         $this->form_validation->set_rules('nama', 'Nama', 'required');
         $this->form_validation->set_rules('unit_kerja', 'Unit Kerja', 'required');
-        if($this->form_validation->run() == false) {
+        if ($this->form_validation->run() == false) {
             $this->session->set_flashdata('message', "<div class='alert alert-danger'>" . validation_errors() . "</div>");
             redirect('master/jabatan');
         }
         $data = $this->input->post(['nama', 'unit_kerja', 'status']);
         $attr['nama'] = $data['nama'];
         $attr['id_unit'] = $data['unit_kerja'];
-        $attr['is_active'] = $data['status'];
+        $attr['is_active'] = $data['status'] ?? false;
         $this->jabatan_model->create($attr);
         $this->session->set_flashdata('message', '<div class="alert alert-success">Jabatan berhasil dibuat</div>');
         redirect('master/jabatan');
@@ -79,19 +88,19 @@ class Jabatan extends Admin_Controller
 
     public function update($id)
     {
-        if(!$this->rbac->hasPrivilege('master_jabatan', 'can_view')){
+        if (!$this->rbac->hasPrivilege('master_jabatan', 'can_view')) {
             access_denied();
         }
         $this->form_validation->set_rules('nama', 'Nama', 'required');
         $this->form_validation->set_rules('unit_kerja', 'Unit Kerja', 'required');
-        if($this->form_validation->run() == false) {
+        if ($this->form_validation->run() == false) {
             $this->session->set_flashdata('message', "<div class='alert alert-danger'>" . validation_errors() . "</div>");
             redirect('master/jabatan');
         }
         $data = $this->input->post(['nama', 'unit_kerja', 'status']);
         $attr['nama'] = $data['nama'];
         $attr['id_unit'] = $data['unit_kerja'];
-        $attr['is_active'] = $data['status'];
+        $attr['is_active'] = $data['status'] ?? false;
         $this->jabatan_model->update($id, $attr);
         $this->session->set_flashdata('message', '<div class="alert alert-success">Jabatan berhasil diupdate</div>');
         redirect('master/jabatan');
