@@ -17,10 +17,10 @@ class History_jabatan_model extends CI_Model
 
     public function get($id)
     {
-        $this->db->select("s.id_sdm, s.sdm_nama, j.nama as jabatan, j.id as jabatan_id, hj.periode_id, p.*,  hj.id");
+        $this->db->select("s.id as user_id, s.name, j.nama as jabatan, j.id as jabatan_id, hj.periode_id, p.*,  hj.id");
         $this->db->from("$this->table as hj");
         $this->db->where('hj.id', $id);
-        $this->db->join("m_sdm as s", "s.id_sdm = hj.sdm_id", "left");
+        $this->db->join("users as s", "s.id = hj.user_id", "left");
         $this->db->join("m_jabatan as j", "j.id = hj.jabatan_id", "left");
         $this->db->join('m_periodes as p', 'p.id = hj.periode_id', 'left');
         $query = $this->db->get();
@@ -30,9 +30,9 @@ class History_jabatan_model extends CI_Model
 
     function all($unit_id = null, $periode = null)
     {
-        $this->datatables->select("hj.id, s.sdm_nama as nama, j.nama as jabatan, p.*", false);
+        $this->datatables->select("hj.id, u.name as nama, j.nama as jabatan, p.*", false);
         $this->datatables->from("$this->table as hj");
-        $this->datatables->join("m_sdm as s", "s.id_sdm = hj.sdm_id", "LEFT");
+        $this->datatables->join("users as u", "u.id = hj.user_id", "LEFT");
         $this->datatables->join("m_jabatan as j", "j.id = hj.jabatan_id", "LEFT");
         $this->datatables->join("m_periodes as p", "p.id = hj.periode_id", "left");
         $this->datatables->where('hj.is_deleted', false);
@@ -47,10 +47,10 @@ class History_jabatan_model extends CI_Model
 
     public function byPeriode($periodeId = null, $unit_id = null)
     {
-        $this->db->select("s.sdm_nama as nama, j.nama as jabatan, p.*, hj.id", false);
+        $this->db->select("hj.kode, s.name as nama, j.nama as jabatan, p.*, hj.id", false);
         $this->db->from("$this->table as hj");
         $this->db->join("m_periodes as p", "p.id = hj.periode_id", 'left');
-        $this->db->join("m_sdm as s", "s.id_sdm = hj.sdm_id", "LEFT");
+        $this->db->join("users as s", "s.id = hj.user_id", "LEFT");
         $this->db->join("m_jabatan as j", "j.id = hj.jabatan_id", "LEFT");
         if ($periodeId) $this->db->where('periode_id', $periodeId);
         if ($unit_id) $this->db->where('j.id_unit', $unit_id);

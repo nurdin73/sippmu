@@ -135,6 +135,18 @@ class Sdm extends Admin_Controller
         redirect('sdm');
     }
 
+    public function updateStatus($id)
+    {
+        $status = $this->input->post('status');
+        $this->sdm_model->update($id, [
+            'is_active' => $status,
+        ]);
+        header('Content-Type: application/json');
+        echo json_encode([
+            'message' => "Status berhasil diubah"
+        ]);
+    }
+
     function destroy($id)
     {
         if (!$this->sdm_model->get($id)) {

@@ -1,12 +1,15 @@
 <?php
 
-class User_model extends CI_Model {
+class User_model extends CI_Model
+{
 
-    function __construct() {
+    function __construct()
+    {
         parent::__construct();
     }
 
-    public function get($id = null) {
+    public function get($id = null)
+    {
 
         $this->db->select('users.*,roles.name as user_type,roles.id as role_id')->from('users')->join("user_roles", "user_roles.user_id = users.id", "left")->join("roles", "user_roles.role_id = roles.id", "left");
 
@@ -25,7 +28,8 @@ class User_model extends CI_Model {
         }
     }
 
-    public function getAll($id = null, $is_active = null) {
+    public function getAll($id = null, $is_active = null)
+    {
 
         $this->db->select("users.*,roles.id as role_id, roles.name as role");
         $this->db->from('users');
@@ -49,7 +53,8 @@ class User_model extends CI_Model {
         }
     }
 
-    public function add($data) {
+    public function add($data)
+    {
 
         if (isset($data['id'])) {
             $this->db->where('id', $data['id']);
@@ -60,7 +65,8 @@ class User_model extends CI_Model {
         }
     }
 
-    public function update($data) {
+    public function update($data)
+    {
         $this->db->where('id', $data['id']);
         $query = $this->db->update('users', $data);
         if ($query) {
@@ -70,7 +76,8 @@ class User_model extends CI_Model {
         }
     }
 
-    public function getByVerificationCode($ver_code) {
+    public function getByVerificationCode($ver_code)
+    {
         $condition = "verification_code =" . "'" . $ver_code . "'";
         $this->db->select('*');
         $this->db->from('users');
@@ -84,7 +91,8 @@ class User_model extends CI_Model {
         }
     }
 
-    public function batchInsert($data, $roles = array()) {
+    public function batchInsert($data, $roles = array())
+    {
 
         $this->db->trans_start();
         $this->db->trans_strict(FALSE);
@@ -107,7 +115,8 @@ class User_model extends CI_Model {
         }
     }
 
-    public function adddoc($data) {
+    public function adddoc($data)
+    {
 
         if (isset($data['id'])) {
             $this->db->where('id', $data['id']);
@@ -118,19 +127,20 @@ class User_model extends CI_Model {
         }
     }
 
-    public function remove($id) {
+    public function remove($id)
+    {
 
         $this->db->where('id', $id);
         $this->db->delete('users');
-
     }
 
-    public function valid_username($str) {
+    public function valid_username($str)
+    {
         $name = $this->input->post('name');
         $id = $this->input->post('username');
         $user_id = $this->input->post('editid');
 
-        if((!isset($id)))  {
+        if ((!isset($id))) {
             $id = 0;
         }
         if (!isset($user_id)) {
@@ -140,15 +150,14 @@ class User_model extends CI_Model {
         if ($this->check_data_exists($name, $id, $user_id)) {
             $this->form_validation->set_message('username_check', 'Record already exists');
             return FALSE;
-           
         } else {
-           
+
             return TRUE;
         }
-       
     }
 
-    function check_data_exists($name, $id, $user_id) {
+    function check_data_exists($name, $id, $user_id)
+    {
 
         if ($user_id != 0) {
             $data = array('id != ' => $user_id, 'username' => $id);
@@ -170,7 +179,8 @@ class User_model extends CI_Model {
         }
     }
 
-    public function valid_email_id($str) {
+    public function valid_email_id($str)
+    {
         $email = $this->input->post('email');
         $id = $this->input->post('username');
         $user_id = $this->input->post('editid');
@@ -190,7 +200,8 @@ class User_model extends CI_Model {
         }
     }
 
-    function check_email_exists($email, $id, $user_id) {
+    function check_email_exists($email, $id, $user_id)
+    {
 
         if ($user_id != 0) {
             $data = array('id != ' => $user_id, 'email' => $email);
@@ -212,10 +223,11 @@ class User_model extends CI_Model {
         }
     }
 
-    public function getStaffRole($id = null) {
+    public function getStaffRole($id = null)
+    {
 
-         $userdata = $this->customlib->getUserData();
-        if($userdata["role_id"] != 1){
+        $userdata = $this->customlib->getUserData();
+        if ($userdata["role_id"] != 1) {
             $this->db->where("id !=", 1);
         }
 
@@ -234,7 +246,8 @@ class User_model extends CI_Model {
         }
     }
 
-    public function alloted_leave($user_id) {
+    public function alloted_leave($user_id)
+    {
 
 
         $query2 = $this->db->select('sum(alloted_leave) as alloted_leave')->where(array('user_id' => $user_id))->get("user_leave_details");
@@ -242,40 +255,43 @@ class User_model extends CI_Model {
         return $query2->result_array();
     }
 
-    function getEmployee($role, $active = 1) {
+    function getEmployee($role, $active = 1)
+    {
 
         $addwhere = '';
         $userdata = $this->customlib->getUserData();
-        if($userdata["role_id"] != 1){
+        if ($userdata["role_id"] != 1) {
             $this->db->where("users.id !=", 1);
         }
-        
+
         $query = $this->db->select("users.*,m_cabang.nama as cabang,roles.name as user_type")
-                ->join('user_roles', "user_roles.user_id = users.id", "left")
-                ->join('roles', "roles.id = user_roles.role_id", "left")
-                ->join('m_cabang', "m_cabang.id = users.cabang", "left")
-                ->where("users.is_active", $active)
-                ->where("roles.name", $role)
-                ->get("users");
+            ->join('user_roles', "user_roles.user_id = users.id", "left")
+            ->join('roles', "roles.id = user_roles.role_id", "left")
+            ->join('m_cabang', "m_cabang.id = users.cabang", "left")
+            ->where("users.is_active", $active)
+            ->where("roles.name", $role)
+            ->get("users");
 
         return $query->result_array();
     }
 
-    function getEmployeeByRoleID($role, $active = 1) {
+    function getEmployeeByRoleID($role, $active = 1)
+    {
 
         $query = $this->db->select("users.*,m_cabang.nama as cabang, roles.id as role_id, roles.name as role")
-                ->join('user_roles', "user_roles.user_id = users.id", "left")
-                ->join('roles', "roles.id = user_roles.role_id", "left")
-                ->join('m_cabang', "m_cabang.id = users.cabang", "left")
-                ->where("users.is_active", $active)
-                ->where("roles.id", $role)
-                ->get("users");
+            ->join('user_roles', "user_roles.user_id = users.id", "left")
+            ->join('roles', "roles.id = user_roles.role_id", "left")
+            ->join('m_cabang', "m_cabang.id = users.cabang", "left")
+            ->where("users.is_active", $active)
+            ->where("roles.id", $role)
+            ->get("users");
 
 
         return $query->result_array();
     }
 
-    function getStaffId($username) {
+    function getStaffId($username)
+    {
 
         $data = array('username' => $username);
         $query = $this->db->select('id')->where($data)->get("users");
@@ -284,7 +300,8 @@ class User_model extends CI_Model {
         return $query->row_array();
     }
 
-    function getProfile($id) {
+    function getProfile($id)
+    {
 
         $this->db->select('users.*,user_roles.role_id, m_cabang.nama as cabang,roles.name as user_type');
         $this->db->join("m_cabang", "m_cabang.id = users.cabang", "left");
@@ -299,34 +316,38 @@ class User_model extends CI_Model {
         return $query->row_array();
     }
 
-    public function searchFullText($cabang, $role, $searchterm, $active) {
-        
-        $addwhere = '';$addwhere2 = '';$addwhere3 = '';
+    public function searchFullText($cabang, $role, $searchterm, $active)
+    {
+
+        $addwhere = '';
+        $addwhere2 = '';
+        $addwhere3 = '';
         $userdata = $this->customlib->getUserData();
-        if($userdata["role_id"] != 1){
+        if ($userdata["role_id"] != 1) {
             $addwhere = " AND users.id != 1";
         }
-        if($role){
-            $addwhere2 = " AND roles.name = '".$role."'";
+        if ($role) {
+            $addwhere2 = " AND roles.name = '" . $role . "'";
         }
-        if($cabang == 'all'){
+        if ($cabang == 'all') {
             $addwhere3 = " ";
-        }else{
-            $addwhere3 = " AND users.cabang = '".$cabang."'";
+        } else {
+            $addwhere3 = " AND users.cabang = '" . $cabang . "'";
         }
         $query = $this->db->query("SELECT users.*, m_cabang.nama as cabang, roles.name as user_type  
             FROM users
             LEFT JOIN user_roles ON user_roles.user_id = users.id 
             LEFT JOIN roles ON user_roles.role_id = roles.id 
             LEFT JOIN m_cabang ON m_cabang.id = users.cabang 
-            WHERE  users.is_active = '$active' ".$addwhere."
-            ".$addwhere3." ".$addwhere2."
+            WHERE  users.is_active = '$active' " . $addwhere . "
+            " . $addwhere3 . " " . $addwhere2 . "
             and (users.name LIKE '%$searchterm%' ESCAPE '!' OR users.username LIKE '%$searchterm%' ESCAPE '!' OR users.email LIKE '%$searchterm%' ESCAPE '!' OR users.phone LIKE '%$searchterm%' ESCAPE '!')");
 
         return $query->result_array();
     }
 
-    public function searchByEmployeeId($username) {
+    public function searchByEmployeeId($username)
+    {
 
         $this->db->select('*');
         $this->db->from('users');
@@ -336,7 +357,8 @@ class User_model extends CI_Model {
         return $query->result_array();
     }
 
-    public function getStaffDoc($id) {
+    public function getStaffDoc($id)
+    {
 
         $this->db->select('*');
         $this->db->from('user_documents');
@@ -345,7 +367,8 @@ class User_model extends CI_Model {
         return $query->row_array();
     }
 
-    public function doc_delete($id, $doc, $file) {
+    public function doc_delete($id, $doc, $file)
+    {
 
         if ($doc == 1) {
 
@@ -367,21 +390,24 @@ class User_model extends CI_Model {
         $this->db->where('id', $id)->update("users", $data);
     }
 
-    public function disableuser($id) {
+    public function disableuser($id)
+    {
 
         $data = array('is_active' => 0);
 
         $query = $this->db->where("id", $id)->update("users", $data);
     }
 
-    public function enableuser($id) {
+    public function enableuser($id)
+    {
 
         $data = array('is_active' => 1);
 
         $query = $this->db->where("id", $id)->update("users", $data);
     }
 
-    public function getByEmail($email) {
+    public function getByEmail($email)
+    {
         $this->db->select('*');
         $this->db->from('users');
         $this->db->where('email', $email);
@@ -393,7 +419,8 @@ class User_model extends CI_Model {
         }
     }
 
-    public function getByUsername($username) {
+    public function getByUsername($username)
+    {
         $this->db->select('users.*, m_cabang.nama as cabang_name, m_cabang.is_pusat as is_pusat');
         $this->db->from('users');
         $this->db->join("m_cabang", "m_cabang.id = users.cabang", "left");
@@ -406,7 +433,8 @@ class User_model extends CI_Model {
         }
     }
 
-    public function checkLogin($data) {
+    public function checkLogin($data)
+    {
 
         //$record = $this->getByEmail($data['email']);
         $record = $this->getByUsername($data['username']);
@@ -428,7 +456,8 @@ class User_model extends CI_Model {
         return false;
     }
 
-    function getStaffbyrole($id) {
+    function getStaffbyrole($id)
+    {
 
         $this->db->select('users.*,user_roles.role_id, m_cabang.nama as cabang,roles.name as user_type');
         $this->db->join("m_cabang", "m_cabang.id = users.cabang", "left");
@@ -442,7 +471,8 @@ class User_model extends CI_Model {
         return $query->result_array();
     }
 
-    public function searchNameLike($searchterm) {
+    public function searchNameLike($searchterm)
+    {
         $this->db->select('users.*')->from('users');
         $this->db->group_start();
         $this->db->like('users.name', $searchterm);
@@ -453,11 +483,17 @@ class User_model extends CI_Model {
         return $query->result_array();
     }
 
-    public function update_role($role_data) {
+    public function update_role($role_data)
+    {
 
         $this->db->where("user_id", $role_data["user_id"])->update("user_roles", $role_data);
     }
 
+    public function search($filter = null, $unit = null)
+    {
+        if ($unit) $this->db->where('cabang', $unit);
+        if ($filter) $this->db->where('name ilike', "%$filter%");
+        $query = $this->db->get('users');
+        return $query->result_array();
+    }
 }
-
-?>

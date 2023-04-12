@@ -1,4 +1,3 @@
-
 <div class="row box-dashboard">
     <div class="col-lg-7 col-md-12">
         <!-- support-section start -->
@@ -164,7 +163,7 @@
         </div> -->
         <!-- page statustic card end -->
     </div>
-    
+
     <!-- seo start -->
     <!-- <div class="col-xl-4 col-md-12">
         <div class="card">

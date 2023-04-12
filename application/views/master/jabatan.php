@@ -6,10 +6,10 @@
                     <h5 class="m-b-10">SDM</h5>
                 </div>
                 <ul class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="<?php echo base_url();?>dashboard"><i
-                                class="feather icon-home"></i></a></li>
+                    <li class="breadcrumb-item"><a href="<?php echo base_url(); ?>dashboard"><i class="feather icon-home"></i></a></li>
                     <li class="breadcrumb-item"><a href="#">Master</a></li>
-                    <li class="breadcrumb-item"><a href="<?php echo base_url();?>master/jabatan">Master Jabatan</a></li>
+                    <li class="breadcrumb-item"><a href="<?php echo base_url(); ?>master/jabatan">Master Jabatan</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -29,6 +29,7 @@
             <table class="table table-striped" id="dt_table">
                 <thead>
                     <tr>
+                        <th>Kode</th>
                         <th>Nama</th>
                         <th>Unit Kerja</th>
                         <th>Status</th>
@@ -73,7 +74,7 @@
                     </div> -->
                     <div class="d-flex align-items-center">
                         <label for="status" class="mb-0 mr-2">Is Active</label>
-                        <input type="checkbox" value="true" name="status">
+                        <input type="checkbox" value="true" name="status" checked>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -130,215 +131,224 @@
 </div>
 
 <script>
-$(document).ready(function() {
+    $(document).ready(function() {
 
-    // add jabatan
-    $('#add-jabatan').on('click', function() {
-        $('#addJabatanModal').modal('show')
-    })
+        // add jabatan
+        $('#add-jabatan').on('click', function() {
+            $('#addJabatanModal').modal('show')
+        })
 
-    // get unit kerja
-    $('.unit_kerja').select2({
-        width: '100%',
-        ajax: {
-            url: "<?= site_url('master/cabang/get_all_data') ?>",
-            dataType: 'json',
-            data: function(params) {
-                return {
-                    search: params.term
-                }
-            },
-            processResults: function(response) {
-                return {
-                    results: response.map(r => {
-                        return {
-                            text: `${r.kode}-${r.nama}`,
-                            id: r.id
-                        }
-                    })
-                }
-            }
-        }
-    })
-
-    $.fn.dataTableExt.oApi.fnPagingInfo = function(oSettings) {
-        return {
-            "iStart": oSettings._iDisplayStart,
-            "iEnd": oSettings.fnDisplayEnd(),
-            "iLength": oSettings._iDisplayLength,
-            "iTotal": oSettings.fnRecordsTotal(),
-            "iFilteredTotal": oSettings.fnRecordsDisplay(),
-            "iPage": Math.ceil(oSettings._iDisplayStart / oSettings._iDisplayLength),
-            "iTotalPages": Math.ceil(oSettings.fnRecordsDisplay() / oSettings._iDisplayLength)
-        };
-    };
-
-    let oTable = $("#dt_table").dataTable({
-        initComplete: function() {
-            var api = this.api();
-            $('#dt_table_filter input')
-                .off('.DT')
-                .on('input.DT', function() {
-                    api.search(this.value).draw();
-                });
-        },
-        iDisplayLength: 15,
-        oLanguage: {
-            sProcessing: "loading..."
-        },
-        dom: 'Bfrtip',
-        responsive: 'true',
-        processing: true,
-        serverSide: true,
-        ajax: {
-            "url": "<?php echo site_url('master/jabatan/data') ?>",
-            "type": "POST"
-        },
-        columns: [{
-                data: "nama"
-            },
-            {
-                data: "unit_kerja"
-            },
-            {
-                data: null,
-                render: function(data, type, row) {
-                    if (data.is_active == 't') {
-                        return '<span class="badge badge-success">aktif</span>';
+        // get unit kerja
+        $('.unit_kerja').select2({
+            width: '100%',
+            ajax: {
+                url: "<?= site_url('master/cabang/get_all_data') ?>",
+                dataType: 'json',
+                data: function(params) {
+                    return {
+                        search: params.term
                     }
-                    return '<span class="badge badge-danger">non aktif</span>';
                 },
-                width: '7%',
-            },
-            {
-                data: "view"
+                processResults: function(response) {
+                    return {
+                        results: response.map(r => {
+                            return {
+                                text: `${r.kode}-${r.nama}`,
+                                id: r.id
+                            }
+                        })
+                    }
+                }
             }
-        ],
-        lengthMenu: [
-            [15, 30, 50, -1],
-            [15, 30, 50, "All"]
-        ],
+        })
 
-        columnDefs: [{
+        $.fn.dataTableExt.oApi.fnPagingInfo = function(oSettings) {
+            return {
+                "iStart": oSettings._iDisplayStart,
+                "iEnd": oSettings.fnDisplayEnd(),
+                "iLength": oSettings._iDisplayLength,
+                "iTotal": oSettings.fnRecordsTotal(),
+                "iFilteredTotal": oSettings.fnRecordsDisplay(),
+                "iPage": Math.ceil(oSettings._iDisplayStart / oSettings._iDisplayLength),
+                "iTotalPages": Math.ceil(oSettings.fnRecordsDisplay() / oSettings._iDisplayLength)
+            };
+        };
 
-                "targets": [-1], //last column
-                "orderable": false, //set not orderable
+        let oTable = $("#dt_table").dataTable({
+            initComplete: function() {
+                var api = this.api();
+                $('#dt_table_filter input')
+                    .off('.DT')
+                    .on('input.DT', function() {
+                        api.search(this.value).draw();
+                    });
             },
-            {
-                "targets": [-1],
-                className: "text-right"
-            }
-        ],
-        buttons: [{
-                extend: 'copyHtml5',
-                text: '<i class="fa fa-files-o"></i>',
-                titleAttr: 'Copy',
-                title: $('.download_label').html(),
-                exportOptions: {
-                    columns: ':visible'
-                }
+            iDisplayLength: 15,
+            oLanguage: {
+                sProcessing: "loading..."
             },
-            {
-                extend: 'excelHtml5',
-                text: '<i class="fa fa-file-excel-o"></i>',
-                titleAttr: 'Excel',
-
-                title: $('.download_label').html(),
-                exportOptions: {
-                    columns: ':visible'
-                }
+            dom: 'Bfrtip',
+            responsive: 'true',
+            processing: true,
+            serverSide: true,
+            ajax: {
+                "url": "<?php echo site_url('master/jabatan/data') ?>",
+                "type": "POST"
             },
-            {
-                extend: 'csvHtml5',
-                text: '<i class="fa fa-file-text-o"></i>',
-                titleAttr: 'CSV',
-                title: $('.download_label').html(),
-                exportOptions: {
-                    columns: ':visible'
-                }
-            },
-            {
-                extend: 'pdfHtml5',
-                text: '<i class="fa fa-file-pdf-o"></i>',
-                titleAttr: 'PDF',
-                title: $('.download_label').html(),
-                exportOptions: {
-                    columns: ':visible'
-
-                }
-            },
-            {
-                extend: 'print',
-                text: '<i class="fa fa-print"></i>',
-                titleAttr: 'Print',
-                title: $('.download_label').html(),
-                customize: function(win) {
-                    $(win.document.body)
-                        .css('font-size', '10pt');
-
-                    $(win.document.body).find('table')
-                        .addClass('compact')
-                        .css('font-size', 'inherit');
+            columns: [{
+                    data: null,
+                    render: function(data) {
+                        if (data.kode) {
+                            return data.kode;
+                        }
+                        return 'N/A'
+                    }
                 },
-                exportOptions: {
-                    columns: ':visible'
+                {
+                    data: "nama"
+                },
+                {
+                    data: "unit_kerja"
+                },
+                {
+                    data: null,
+                    render: function(data, type, row) {
+                        if (data.is_active == 't') {
+                            return '<span class="badge badge-success">aktif</span>';
+                        }
+                        return '<span class="badge badge-danger">non aktif</span>';
+                    },
+                    width: '7%',
+                },
+                {
+                    data: "view"
                 }
-            },
-            {
-                extend: 'colvis',
-                text: '<i class="fa fa-columns"></i>',
-                titleAttr: 'Columns',
-                title: $('.download_label').html(),
-                postfixButtons: ['colvisRestore']
-            },
-        ],
-        order: [
-            [0, 'asc']
-        ],
-        rowCallback: function(row, data, iDisplayIndex) {
-            var info = this.fnPagingInfo();
-            var page = info.iPage;
-            var length = info.iLength;
-            $('td:eq(0)', row).html();
-        }
+            ],
+            lengthMenu: [
+                [15, 30, 50, -1],
+                [15, 30, 50, "All"]
+            ],
+
+            columnDefs: [{
+
+                    "targets": [-1], //last column
+                    "orderable": false, //set not orderable
+                },
+                {
+                    "targets": [-1],
+                    className: "text-right"
+                }
+            ],
+            buttons: [{
+                    extend: 'copyHtml5',
+                    text: '<i class="fa fa-files-o"></i>',
+                    titleAttr: 'Copy',
+                    title: $('.download_label').html(),
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    text: '<i class="fa fa-file-excel-o"></i>',
+                    titleAttr: 'Excel',
+
+                    title: $('.download_label').html(),
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'csvHtml5',
+                    text: '<i class="fa fa-file-text-o"></i>',
+                    titleAttr: 'CSV',
+                    title: $('.download_label').html(),
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    text: '<i class="fa fa-file-pdf-o"></i>',
+                    titleAttr: 'PDF',
+                    title: $('.download_label').html(),
+                    exportOptions: {
+                        columns: ':visible'
+
+                    }
+                },
+                {
+                    extend: 'print',
+                    text: '<i class="fa fa-print"></i>',
+                    titleAttr: 'Print',
+                    title: $('.download_label').html(),
+                    customize: function(win) {
+                        $(win.document.body)
+                            .css('font-size', '10pt');
+
+                        $(win.document.body).find('table')
+                            .addClass('compact')
+                            .css('font-size', 'inherit');
+                    },
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'colvis',
+                    text: '<i class="fa fa-columns"></i>',
+                    titleAttr: 'Columns',
+                    title: $('.download_label').html(),
+                    postfixButtons: ['colvisRestore']
+                },
+            ],
+            order: [
+                [0, 'asc']
+            ],
+            rowCallback: function(row, data, iDisplayIndex) {
+                var info = this.fnPagingInfo();
+                var page = info.iPage;
+                var length = info.iLength;
+                $('td:eq(0)', row).html();
+            }
+
+        });
+
+
+        // edit
+        $('#dt_table').on('click', '.btn-edit', function(e) {
+            e.preventDefault()
+            const id = $(this).data('id');
+            $('#editForm').attr('action', "<?= site_url('master/jabatan/update/') ?>" + id)
+            $.ajax({
+                type: "get",
+                url: "<?= base_url('master/jabatan/get/') ?>" + id,
+                dataType: "json",
+                success: function(response) {
+                    $('#editJabatanModal').modal('show')
+                    $('#editForm input[name=nama]').val(response.nama);
+                    const option = new Option(response.unit_kerja, response.unit_id, true,
+                        true);
+                    $('#editForm select[name=unit_kerja]').append(option).trigger('change');
+                    if (response.status == 'f') {
+                        $('#editForm input[name=status]').attr('checked', false).trigger(
+                            'change')
+                    }
+
+                    if (response.status == 't') {
+                        $('#editForm input[name=status]').attr('checked', true).trigger(
+                            'change')
+                    }
+                }
+            });
+        })
+
+        $('#dt_table').on('click', '.btn-delete', function(e) {
+            e.preventDefault()
+            const id = $(this).data('id');
+            const nama = $(this).data('nama');
+            delete_recordById('<?php echo base_url() ?>master/jabatan/destroy/' + id, nama);
+        })
 
     });
-
-
-    // edit
-    $('#dt_table').on('click', '.btn-edit', function(e) {
-        e.preventDefault()
-        const id = $(this).data('id');
-        $('#editForm').attr('action', "<?= site_url('master/jabatan/update/') ?>" + id)
-        $.ajax({
-            type: "get",
-            url: "<?= base_url('master/jabatan/get/') ?>" + id,
-            dataType: "json",
-            success: function(response) {
-                $('#editJabatanModal').modal('show')
-                $('#editForm input[name=nama]').val(response.nama);
-                const option = new Option(response.unit_kerja, response.unit_id, true,
-                true);
-                $('#editForm select[name=unit_kerja]').append(option).trigger('change');
-                if (response.status == 'f') {
-                    $('#editForm input[name=status]').attr('checked', false).trigger(
-                        'change')
-                }
-
-                if (response.status == 't') {
-                    $('#editForm input[name=status]').attr('checked', true).trigger(
-                        'change')
-                }
-            }
-        });
-    })
-
-    $('#dt_table').on('click', '.btn-delete', function(e) {
-        e.preventDefault()
-        const id = $(this).data('id');
-        const nama = $(this).data('nama');
-        delete_recordById('<?php echo base_url() ?>master/jabatan/destroy/' + id, nama);
-    })
-
-});
 </script>

@@ -6,6 +6,7 @@ class Jabatan extends Admin_Controller
     {
         parent::__construct();
         $this->load->model('jabatan_model');
+        $this->load->model('cabang_model');
     }
 
     function index()
@@ -68,19 +69,9 @@ class Jabatan extends Admin_Controller
 
     function insert()
     {
-        if (!$this->rbac->hasPrivilege('master_jabatan', 'can_view')) {
-            access_denied();
-        }
-        $this->form_validation->set_rules('nama', 'Nama', 'required');
-        $this->form_validation->set_rules('unit_kerja', 'Unit Kerja', 'required');
-        if ($this->form_validation->run() == false) {
-            $this->session->set_flashdata('message', "<div class='alert alert-danger'>" . validation_errors() . "</div>");
-            redirect('master/jabatan');
-        }
-        $data = $this->input->post(['nama', 'unit_kerja', 'status']);
-        $attr['nama'] = $data['nama'];
-        $attr['id_unit'] = $data['unit_kerja'];
-        $attr['is_active'] = $data['status'] ?? false;
+        $attr = $this->validation();
+        $unit = $this->cabang_model->getData($attr['id_unit'])['nama'];
+        $attr['kode'] = $this->jabatan_model->generateCode(initial($unit));
         $this->jabatan_model->create($attr);
         $this->session->set_flashdata('message', '<div class="alert alert-success">Jabatan berhasil dibuat</div>');
         redirect('master/jabatan');
@@ -88,20 +79,14 @@ class Jabatan extends Admin_Controller
 
     public function update($id)
     {
-        if (!$this->rbac->hasPrivilege('master_jabatan', 'can_view')) {
-            access_denied();
-        }
-        $this->form_validation->set_rules('nama', 'Nama', 'required');
-        $this->form_validation->set_rules('unit_kerja', 'Unit Kerja', 'required');
-        if ($this->form_validation->run() == false) {
-            $this->session->set_flashdata('message', "<div class='alert alert-danger'>" . validation_errors() . "</div>");
-            redirect('master/jabatan');
-        }
-        $data = $this->input->post(['nama', 'unit_kerja', 'status']);
-        $attr['nama'] = $data['nama'];
-        $attr['id_unit'] = $data['unit_kerja'];
-        $attr['is_active'] = $data['status'] ?? false;
+        $attr = $this->validation(true);
+        $attr['kode'] = null;
         $this->jabatan_model->update($id, $attr);
+        $unit = $this->cabang_model->getData($attr['id_unit'])['nama'];
+        $kode = $this->jabatan_model->generateCode(initial($unit));
+        $this->jabatan_model->update($id, [
+            'kode' => $kode
+        ]);
         $this->session->set_flashdata('message', '<div class="alert alert-success">Jabatan berhasil diupdate</div>');
         redirect('master/jabatan');
     }
@@ -111,5 +96,27 @@ class Jabatan extends Admin_Controller
         $this->jabatan_model->destroy($id);
         $this->session->set_flashdata('message', '<div class="alert alert-success">Jabatan berhasil dihapus</div>');
         redirect('master/jabatan');
+    }
+
+    public function validation($isUpdate = false)
+    {
+        if (!$this->rbac->hasPrivilege('master_jabatan', 'can_view')) {
+            access_denied();
+        }
+        $this->form_validation->set_rules('nama', 'Nama', 'required');
+        $this->form_validation->set_rules('unit_kerja', 'Unit Kerja', 'required');
+        if ($this->form_validation->run() == false) {
+            $this->session->set_flashdata('message', "<div class='alert alert-danger'>" . validation_errors() . "</div>");
+            redirect('master/jabatan');
+        }
+        $data = $this->input->post(['nama', 'unit_kerja', 'status']);
+        $attr['nama'] = $data['nama'];
+        $attr['id_unit'] = $data['unit_kerja'];
+        $attr['is_active'] = $data['status'] ?? false;
+        if (!$isUpdate) {
+            $attr['created_by'] = $this->customlib->getStaffID();
+        }
+        $attr['updated_by'] = $this->customlib->getStaffID();
+        return $attr;
     }
 }

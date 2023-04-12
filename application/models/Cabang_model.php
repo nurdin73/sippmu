@@ -68,7 +68,7 @@ class Cabang_model extends CI_model
         $this->db->from("m_cabang as mc");
         if (isset($id)) {
 
-            $query = $this->db->where("id", $id)->get('m_cabang');
+            $query = $this->db->where("mc.id", $id)->get('m_cabang');
             return $query->row_array();
         } else {
             if ($filter) {

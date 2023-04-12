@@ -1,8 +1,10 @@
 <?php
 
-class User extends Admin_Controller {
+class User extends Admin_Controller
+{
 
-    function __construct() {
+    function __construct()
+    {
         parent::__construct();
 
         $this->config->load("hejoe");
@@ -13,7 +15,8 @@ class User extends Admin_Controller {
         header("Cache-Control: no cache");
     }
 
-    function index() {
+    function index()
+    {
         if (!$this->rbac->hasPrivilege('user', 'can_view')) {
             access_denied();
         }
@@ -22,34 +25,34 @@ class User extends Admin_Controller {
         $this->session->set_userdata('top_menu', 'HR');
         $this->session->set_userdata('sub_menu', 'admin/user');
         $search = $this->input->post("search");
-        
+
         $data_session = $this->session->userdata('admin');
         $userinput = $data_session['username'];
         $cabang = $data_session['cabang'];
         $is_pusat = $data_session['is_pusat'];
-        
+
         $cabangx = $this->input->post('cabangx');
         $role = $this->input->post('role');
         $search_text = $this->input->post('search_text');
-        
-        
+
+
         $userRole = $this->user_model->getStaffRole();
         $data["role"] = $userRole;
         $data["role_id"] = "";
-        
+
         $data["cbx_cabang"] = $this->cabang_model->getCabang();
         $data['cabangx'] = $cabangx ? $cabangx : $cabang;
         $data['is_pusat'] = $is_pusat;
         $data['is_disabled'] = 'disabled="disabled"';
-        if($is_pusat == 't'){
+        if ($is_pusat == 't') {
             $data['is_disabled'] = '';
             $data['cabangx'] = $cabangx ? $cabangx : 'all';
         }
-        
-        
+
+
         $resultlist = $this->user_model->searchFullText($data['cabangx'], $role, "", 1);
         $data['resultlist'] = $resultlist;
-        
+
         if (isset($search)) {
             if ($search == 'search_filter') {
                 $this->form_validation->set_rules('role', 'Role', 'trim|required|xss_clean');
@@ -79,7 +82,8 @@ class User extends Admin_Controller {
         $this->load->view('layout/footer');
     }
 
-    function disableuserlist() {
+    function disableuserlist()
+    {
 
         if (!$this->rbac->hasPrivilege('disable_user', 'can_view')) {
             access_denied();
@@ -125,7 +129,8 @@ class User extends Admin_Controller {
         $this->load->view('layout/footer', $data);
     }
 
-    function profile($idx) {
+    function profile($idx)
+    {
         if (!$this->rbac->hasPrivilege('user', 'can_view')) {
             access_denied();
         }
@@ -139,7 +144,7 @@ class User extends Admin_Controller {
         $user_info = $this->user_model->getProfile($id);
         $userdata = $this->customlib->getUserData();
         $userid = $userdata['id'];
-        
+
         $data['user_doc_id'] = $id;
         $data['user'] = $user_info;
         $data["status"] = $this->status;
@@ -154,7 +159,8 @@ class User extends Admin_Controller {
         $this->load->view('layout/footer', $data);
     }
 
-    public function download($user_id, $doc) {
+    public function download($user_id, $doc)
+    {
 
         $this->load->helper('download');
         $filepath = "./uploads/user_documents/$user_id/" . $this->uri->segment(5);
@@ -164,21 +170,23 @@ class User extends Admin_Controller {
         force_download($name, $data);
     }
 
-    function doc_delete($id, $doc, $file) {
+    function doc_delete($id, $doc, $file)
+    {
         $this->user_model->doc_delete($id, $doc, $file);
         $this->session->set_flashdata('msg', '<i class="fa fa-check-square-o" aria-hidden="true"></i> Document Deleted Successfully');
         redirect('admin/user/profile/' . $id);
     }
 
-    
-    function create() {
+
+    function create()
+    {
         $this->session->set_userdata('top_menu', 'HR');
         $this->session->set_userdata('sub_menu', 'admin/user');
         $roles = $this->role_model->get();
         $data["roles"] = $roles;
         $genderList = $this->customlib->getGender();
         $data['genderList'] = $genderList;
-        
+
         $data["cabangs"] = $this->cabang_model->getCabang();
 
         $data['title'] = 'Add Staff';
@@ -192,7 +200,7 @@ class User extends Admin_Controller {
         $this->form_validation->set_rules('password', 'password', 'trim|required|regex_match[/^([a-zA-Z0-9]|\s)+$/]|xss_clean');
         $this->form_validation->set_rules('gender', 'Gender', 'trim|xss_clean');
         $this->form_validation->set_rules('cabang', 'Cabang', 'trim|required|xss_clean');
-       
+
         if ($this->form_validation->run() == FALSE) {
 
             $this->load->view('layout/header', $data);
@@ -210,6 +218,7 @@ class User extends Admin_Controller {
             $address = $this->input->post("address");
             $note = $this->input->post("note");
             $password = $this->input->post("password");
+            $nbm = $this->input->post("nbm");
             //$password = $this->role->get_random_password($chars_min = 6, $chars_max = 6, $use_upper_case = false, $include_numbers = true, $include_special_chars = false);
             $data_insert = array(
                 'password' => $this->enc_lib->passHashEnc($password),
@@ -221,10 +230,11 @@ class User extends Admin_Controller {
                 'address' => $address,
                 'note' => $note,
                 'gender' => $gender,
-                'is_active' => 1
+                'is_active' => 1,
+                'nbm' => $nbm
             );
 
-            if($dob != ""){
+            if ($dob != "") {
                 $data_insert['dob'] = date('Y-m-d', $this->customlib->datetostrtotime($dob));
             }
 
@@ -254,70 +264,82 @@ class User extends Admin_Controller {
 
     public function username_check($str)
     {
-        if(empty($str)){
-        $this->form_validation->set_message('username_check', 'Username field is required');
-        return false;
-        }else{
-          
-          $result = $this->user_model->valid_username($str);
-          if($result == false){
-            
+        if (empty($str)) {
+            $this->form_validation->set_message('username_check', 'Username field is required');
             return false;
-          }
-            return true ;
+        } else {
+
+            $result = $this->user_model->valid_username($str);
+            if ($result == false) {
+
+                return false;
+            }
+            return true;
         }
     }
 
-    function edit($idx) {
+    public function search()
+    {
+        $search = $this->input->get('search') ?? null;
+        $unit = $this->input->get('unit') ?? null;
+        $results = $this->user_model->search($search, $unit);
+        header('Content-Type: application/json');
+        echo json_encode($results);
+    }
+
+    function edit($idx)
+    {
         if (!$this->rbac->hasPrivilege('user', 'can_edit')) {
             access_denied();
         }
-        $a = 0 ;
-          
+        $a = 0;
+
         $id = decrypt_url($idx);
 
         $sessionData = $this->session->userdata('admin');
         $userdata = $this->customlib->getUserData();
-            
-        
+
+
         $data['title'] = 'Edit User';
         $data['id'] = $idx;
         $genderList = $this->customlib->getGender();
         $data['genderList'] = $genderList;
-        
+
         $userRole = $this->user_model->getStaffRole();
         $data["getStaffRole"] = $userRole;
         $data["cabangs"] = $this->cabang_model->getCabang();
-        
+
         $data['title'] = 'Edit User';
         $user = $this->user_model->get($id);
         $data['user'] = $user;
 
-            if($user["role_id"] == 7){
-                $a = 0;
-                if($userdata["email"] == $user["email"]){
-                    $a = 1;    
-                }
-            }else{
-                $a = 1 ;
+        if ($user["role_id"] == 7) {
+            $a = 0;
+            if ($userdata["email"] == $user["email"]) {
+                $a = 1;
             }
+        } else {
+            $a = 1;
+        }
 
-            if($a != 1){
-                access_denied();
+        if ($a != 1) {
+            access_denied();
+        }
 
-            }
-        
         $this->form_validation->set_rules('name', 'Name', "trim|required|xss_clean");
         $this->form_validation->set_rules('role', 'Role', 'trim|required|regex_match[/^[0-9]+$/]|xss_clean');
         $this->form_validation->set_rules('phone', 'phone', 'trim|regex_match[/^[0-9]{10}$/]|min_length[6]|max_length[15]|xss_clean');
         $this->form_validation->set_rules('email', 'email', 'trim|valid_email|xss_clean');
         $this->form_validation->set_rules('gender', 'Gender', 'trim|xss_clean');
         $this->form_validation->set_rules('cabang', 'Cabang', 'trim|required|xss_clean');
-       
+
         $this->form_validation->set_rules(
-                'email', 'Email', array('valid_email',
-            array('check_exists', array($this->user_model, 'valid_email_id'))
-                )
+            'email',
+            'Email',
+            array(
+                'valid_email',
+                array('check_exists', array($this->user_model, 'valid_email_id'))
+            )
         );
         if ($this->form_validation->run() == FALSE) {
 
@@ -325,7 +347,7 @@ class User extends Admin_Controller {
             $this->load->view('admin/user/useredit', $data);
             $this->load->view('layout/footer', $data);
         } else {
-  
+
             $cabang = $this->input->post("cabang");
             $role = $this->input->post("role");
             $name = $this->input->post("name");
@@ -333,14 +355,16 @@ class User extends Admin_Controller {
             $dob = $this->input->post("dob");
             $phone = $this->input->post("phone");
             $email = $this->input->post("email");
-          
+
             $address = $this->input->post("address");
 
             $note = $this->input->post("note");
             $password = $this->input->post("password");
+            $nbm = $this->input->post("nbm");
 
 
-            $data1 = array('id' => $id,
+            $data1 = array(
+                'id' => $id,
                 'cabang' => $cabang,
                 'name' => $name,
                 'phone' => $phone,
@@ -349,9 +373,10 @@ class User extends Admin_Controller {
                 'address' => $address,
                 'note' => $note,
                 'gender' => $gender,
+                'nbm' => $nbm
             );
-              
-            if(!empty($password)){
+
+            if (!empty($password)) {
                 $data1['password'] = $this->enc_lib->passHashEnc($password);
             }
             $insert_id = $this->user_model->add($data1);
@@ -369,11 +394,11 @@ class User extends Admin_Controller {
                 move_uploaded_file($_FILES["file"]["tmp_name"], "./uploads/user_images/" . $img_name);
                 $data_img = array('id' => $id, 'image' => $img_name);
                 $this->user_model->add($data_img);
-                
-//                echo $_FILES["file"]["tmp_name"];echo '<br>';
-//                echo $_FILES['file']['name'];echo '<br>';
-//                echo $img_name;
-//                die();
+
+                //                echo $_FILES["file"]["tmp_name"];echo '<br>';
+                //                echo $_FILES['file']['name'];echo '<br>';
+                //                echo $img_name;
+                //                die();
             }
 
             $this->session->set_flashdata('msg', '<div class="alert alert-success">Record Updated Successfully</div>');
@@ -381,55 +406,58 @@ class User extends Admin_Controller {
         }
     }
 
-    function edit_profile($idx) {
+    function edit_profile($idx)
+    {
         if (!$this->rbac->hasPrivilege('can_see_other_users_profile', 'can_edit')) {
             access_denied();
         }
-        $a = 0 ;
-          
+        $a = 0;
+
         $id = decrypt_url($idx);
 
         $sessionData = $this->session->userdata('admin');
         $userdata = $this->customlib->getUserData();
-            
-        
+
+
         $data['title'] = 'Edit Profile';
         $data['id'] = $idx;
         $genderList = $this->customlib->getGender();
         $data['genderList'] = $genderList;
-        
+
         $userRole = $this->user_model->getStaffRole();
         $data["getStaffRole"] = $userRole;
         $data["cabangs"] = $this->cabang_model->getCabang();
-        
+
         $user = $this->user_model->get($id);
         $data['user'] = $user;
 
-            if($user["role_id"] == 7){
-                $a = 0;
-                if($userdata["email"] == $user["email"]){
-                    $a = 1;    
-                }
-            }else{
-                $a = 1 ;
+        if ($user["role_id"] == 7) {
+            $a = 0;
+            if ($userdata["email"] == $user["email"]) {
+                $a = 1;
             }
+        } else {
+            $a = 1;
+        }
 
-            if($a != 1){
-                access_denied();
+        if ($a != 1) {
+            access_denied();
+        }
 
-            }
-        
         $this->form_validation->set_rules('name', 'Name', "trim|required|regex_match[/^([a-zA-Z]|\.|\s)+$/]|xss_clean");
         //$this->form_validation->set_rules('role', 'Role', 'trim|required|regex_match[/^[0-9]+$/]|xss_clean');
         $this->form_validation->set_rules('phone', 'phone', 'trim|regex_match[/^[0-9]{10}$/]|min_length[6]|max_length[15]|xss_clean');
         $this->form_validation->set_rules('email', 'email', 'trim|valid_email|xss_clean');
         $this->form_validation->set_rules('gender', 'Gender', 'trim|required|xss_clean');
         //$this->form_validation->set_rules('cabang', 'Cabang', 'trim|required|xss_clean');
-       
+
         $this->form_validation->set_rules(
-                'email', 'Email', array('valid_email',
-            array('check_exists', array($this->user_model, 'valid_email_id'))
-                )
+            'email',
+            'Email',
+            array(
+                'valid_email',
+                array('check_exists', array($this->user_model, 'valid_email_id'))
+            )
         );
         if ($this->form_validation->run() == FALSE) {
 
@@ -437,19 +465,22 @@ class User extends Admin_Controller {
             $this->load->view('admin/user/useredit_profile', $data);
             $this->load->view('layout/footer', $data);
         } else {
-  
+
             $cabang = $this->input->post("cabang");
             //$role = $this->input->post("role");
             $name = $this->input->post("name");
             $gender = $this->input->post("gender");
             $phone = $this->input->post("phone");
             $email = $this->input->post("email");
-          
+
             $address = $this->input->post("address");
 
             $note = $this->input->post("note");
-            
-            $data1 = array('id' => $id,
+            $nbm = $this->input->post("nbm");
+
+
+            $data1 = array(
+                'id' => $id,
                 //'cabang' => $cabang,
                 'name' => $name,
                 'phone' => $phone,
@@ -457,6 +488,7 @@ class User extends Admin_Controller {
                 'address' => $address,
                 'note' => $note,
                 'gender' => $gender,
+                // 'nbm' => $nbm
             );
             $update = $this->user_model->add($data1);
 
@@ -466,11 +498,11 @@ class User extends Admin_Controller {
                 move_uploaded_file($_FILES["file"]["tmp_name"], "./uploads/user_images/" . $img_name);
                 $data_img = array('id' => $id, 'image' => $img_name);
                 $this->user_model->add($data_img);
-                
-//                echo $_FILES["file"]["tmp_name"];echo '<br>';
-//                echo $_FILES['file']['name'];echo '<br>';
-//                echo $img_name;
-//                die();
+
+                //                echo $_FILES["file"]["tmp_name"];echo '<br>';
+                //                echo $_FILES['file']['name'];echo '<br>';
+                //                echo $img_name;
+                //                die();
             }
 
             $this->session->set_flashdata('msg', '<div class="alert alert-success">Record Updated Successfully</div>');
@@ -478,25 +510,26 @@ class User extends Admin_Controller {
         }
     }
 
-    function delete($id) {
+    function delete($id)
+    {
         if (!$this->rbac->hasPrivilege('user', 'can_delete')) {
             access_denied();
         }
 
-                $a = 0 ;
-          $sessionData = $this->session->userdata('admin');
-            $userdata = $this->customlib->getUserData();
-            $user = $this->user_model->get($id);
-             if($user["role_id"] == 7){
-                $a = 0;
-                if($userdata["email"] == $user["email"]){
-                    $a = 1;    
-                }
-            }else{
-                $a = 1 ;
+        $a = 0;
+        $sessionData = $this->session->userdata('admin');
+        $userdata = $this->customlib->getUserData();
+        $user = $this->user_model->get($id);
+        if ($user["role_id"] == 7) {
+            $a = 0;
+            if ($userdata["email"] == $user["email"]) {
+                $a = 1;
             }
-        
-        if($a != 1){
+        } else {
+            $a = 1;
+        }
+
+        if ($a != 1) {
             access_denied();
         }
         $data['title'] = 'Users List';
@@ -504,54 +537,57 @@ class User extends Admin_Controller {
         redirect('admin/user');
     }
 
-    function disableuser($id) {
+    function disableuser($id)
+    {
         if (!$this->rbac->hasPrivilege('disable_user', 'can_view')) {
 
             access_denied();
         }
-        $a = 0 ;
-          $sessionData = $this->session->userdata('admin');
-            $userdata = $this->customlib->getUserData();
-            $user = $this->user_model->get($id);
-             if($user["role_id"] == 7){
-                $a = 0;
-                if($userdata["email"] == $user["email"]){
-                    $a = 1;    
-                }
-            }else{
-                $a = 1 ;
+        $a = 0;
+        $sessionData = $this->session->userdata('admin');
+        $userdata = $this->customlib->getUserData();
+        $user = $this->user_model->get($id);
+        if ($user["role_id"] == 7) {
+            $a = 0;
+            if ($userdata["email"] == $user["email"]) {
+                $a = 1;
             }
-        
-        if($a != 1){
+        } else {
+            $a = 1;
+        }
+
+        if ($a != 1) {
             access_denied();
         }
         $this->user_model->disableuser($id);
         redirect('admin/user/profile/' . $id);
     }
 
-    function enableuser($id) {
+    function enableuser($id)
+    {
 
-        $a = 0 ;
-          $sessionData = $this->session->userdata('admin');
-            $userdata = $this->customlib->getUserData();
-            $user = $this->user_model->get($id);
-             if($user["role_id"] == 7){
-                $a = 0;
-                if($userdata["email"] == $user["email"]){
-                    $a = 1;    
-                }
-            }else{
-                $a = 1 ;
+        $a = 0;
+        $sessionData = $this->session->userdata('admin');
+        $userdata = $this->customlib->getUserData();
+        $user = $this->user_model->get($id);
+        if ($user["role_id"] == 7) {
+            $a = 0;
+            if ($userdata["email"] == $user["email"]) {
+                $a = 1;
             }
-        
-        if($a != 1){
+        } else {
+            $a = 1;
+        }
+
+        if ($a != 1) {
             access_denied();
         }
         $this->user_model->enableuser($id);
         redirect('admin/user/profile/' . $id);
     }
 
-    function getEmployeeByRole() {
+    function getEmployeeByRole()
+    {
 
         $role = $this->input->post("role");
 
@@ -560,7 +596,8 @@ class User extends Admin_Controller {
         echo json_encode($data);
     }
 
-    function dateDifference($date_1, $date_2, $differenceFormat = '%a') {
+    function dateDifference($date_1, $date_2, $differenceFormat = '%a')
+    {
         $datetime1 = date_create($date_1);
         $datetime2 = date_create($date_2);
 
@@ -569,7 +606,8 @@ class User extends Admin_Controller {
         return $interval->format($differenceFormat) + 1;
     }
 
-    function permission($id) {
+    function permission($id)
+    {
         $data['title'] = 'Add Role';
         $data['id'] = $id;
         $user = $this->user_model->get($id);
@@ -581,8 +619,7 @@ class User extends Admin_Controller {
             $user_id = $this->input->post('user_id');
             $prev_array = $this->input->post('prev_array');
             if (!isset($prev_array)) {
-                $prev_array = array();
-                ;
+                $prev_array = array();;
             }
             $module_perm = $this->input->post('module_perm');
             $delete_array = array_diff($prev_array, $module_perm);
@@ -611,7 +648,8 @@ class User extends Admin_Controller {
 
 
 
-    function change_password($id){
+    function change_password($id)
+    {
 
         $sessionData = $this->session->userdata('admin');
         $userdata = $this->customlib->getUserData();
@@ -625,11 +663,11 @@ class User extends Admin_Controller {
                 'current_pass' => form_error('current_pass'),
                 'new_pass' => form_error('new_pass'),
                 'confirm_pass' => form_error('confirm_pass'),
-                
+
             );
 
-            $array = array('status' => 'fail', 'error' => $msg, 'message' => '');      
-        }else{
+            $array = array('status' => 'fail', 'error' => $msg, 'message' => '');
+        } else {
 
             $sessionData = $this->session->userdata('admin');
             $userdata = $this->customlib->getUserData();
@@ -654,7 +692,7 @@ class User extends Admin_Controller {
                     $query2 = $this->admin_model->saveNewPass($newdata);
                     if ($query2) {
                         $array = array('status' => 'success', 'error' => '', 'message' => "Password Changed Successfully");
-                    }else{
+                    } else {
                         $array = array('status' => 'fail', 'error' => '', 'message' => "Password Not Changed");
                     }
                 } else {
@@ -664,12 +702,8 @@ class User extends Admin_Controller {
 
                 $array = array('status' => 'fail', 'error' => '', 'message' => "Invalid current password");
             }
+        }
 
-        } 
-  
-        echo json_encode($array);   
+        echo json_encode($array);
     }
-
 }
-
-?>

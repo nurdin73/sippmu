@@ -6,7 +6,7 @@ class Jabatan_model extends CI_Model
 
     function getAll()
     {
-        $this->datatables->select("j.id, j.nama, c.nama as unit_kerja, j.is_active", false);
+        $this->datatables->select("j.id, j.nama, j.kode, c.nama as unit_kerja, j.is_active", false);
         $this->datatables->from('m_jabatan as j');
         $this->datatables->join('m_cabang as c', 'c.id = j.id_unit', 'LEFT');
         $this->datatables->where('j.is_deleted', false);
@@ -19,7 +19,7 @@ class Jabatan_model extends CI_Model
 
     function get($id)
     {
-        $this->db->select("m_jabatan.id, m_jabatan.nama, concat(c.kode, '-', c.nama) as unit_kerja, c.id as unit_id, m_jabatan.is_active");
+        $this->db->select("m_jabatan.id, m_jabatan.nama, m_jabatan.kode, concat(c.kode, '-', c.nama) as unit_kerja, c.id as unit_id, m_jabatan.is_active");
         $this->db->where('m_jabatan.id', $id);
         $this->db->join('m_cabang as c', "c.id = m_jabatan.id_unit", "left");
         $query = $this->db->get($this->table);
@@ -28,10 +28,10 @@ class Jabatan_model extends CI_Model
 
     function getData($unit = null, $search = null)
     {
-        if($unit) {
+        if ($unit) {
             $this->db->where('id_unit', $unit);
         }
-        if($search) {
+        if ($search) {
             $this->db->where('nama ilike', "%$search%");
         }
         $this->db->where('is_deleted', false);
@@ -45,7 +45,7 @@ class Jabatan_model extends CI_Model
         $this->db->where('id_unit', $id);
         $this->db->where('is_deleted', false);
         $this->db->where('is_active', true);
-        if($filter) $this->db->where("nama ilike", "%$filter%");
+        if ($filter) $this->db->where("nama ilike", "%$filter%");
         $query = $this->db->get($this->table);
         return $query->result_array();
     }
@@ -56,7 +56,7 @@ class Jabatan_model extends CI_Model
         $jabatan_id = $this->db->insert_id();
         return $jabatan_id;
     }
-    
+
 
     public function update($id, $data)
     {
@@ -71,4 +71,17 @@ class Jabatan_model extends CI_Model
         $this->db->update($this->table);
     }
 
+    public function generateCode($code)
+    {
+        $length = strlen($code);
+        $code = strtoupper($code);
+        $substrLength = $length + 1;
+        $query = "SELECT MAX(SUBSTRING(kode, $substrLength, 4)) as kode from $this->table where SUBSTRING(kode, 1, $length) = '$code' and is_deleted = false";
+        $result = $this->db->query($query);
+        $data = $result->row_array();
+        $order = (int)$data['kode'];
+        $order++;
+        $orderCode = sprintf("%04s", $order);
+        return $code . $orderCode;
+    }
 }

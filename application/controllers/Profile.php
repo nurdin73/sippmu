@@ -8,6 +8,8 @@ class Profile extends Admin_Controller
         $this->load->model('history_jabatan_model');
         $this->load->model('sdm_model');
         $this->load->model('periode_model');
+        $this->load->model('user_model');
+        $this->load->model('jabatan_model');
     }
 
     function index()
@@ -59,10 +61,25 @@ class Profile extends Admin_Controller
             access_denied();
         }
         $attr = $this->validation();
-        $this->history_jabatan_model->create($attr);
-        $this->sdm_model->update($attr['sdm_id'], [
-            'sdm_jabatan' => $attr['jabatan_id']
-        ]);
+        $history = $attr;
+        unset($history['unit_id']);
+        $this->history_jabatan_model->create($history);
+        $check = $this->sdm_model->getByUserId($attr['user_id']);
+        if ($check) {
+            $this->sdm_model->update($check['id'], [
+                'jabatan_id' => $attr['jabatan_id']
+            ]);
+        } else {
+            $sdm = [
+                'user_id' => $attr['user_id'],
+                'jabatan_id' => $attr['jabatan_id'],
+                'unit_id' => $attr['unit_id'],
+                'created_by' => $attr['created_by'],
+                'updated_by' => $attr['updated_by'],
+                'kode' => $attr['kode']
+            ];
+            $this->sdm_model->create($sdm);
+        }
         $this->session->set_flashdata('message', '<div class="alert alert-success">Jabatan berhasil dibuat</div>');
         redirect('profile');
     }
@@ -73,15 +90,37 @@ class Profile extends Admin_Controller
             access_denied();
         }
         $attr = $this->validation(true);
+        $history = $attr;
+        unset($history['unit_id']);
         $find = $this->history_jabatan_model->get($id);
         $this->history_jabatan_model->destroy($id);
-        $this->history_jabatan_model->create($attr);
-        $this->sdm_model->update($attr['sdm_id'], [
-            'sdm_jabatan' => $attr['jabatan_id']
+        $this->history_jabatan_model->create($history);
+        // $this->sdm_model->update($attr['user_id'], [
+        //     'sdm_jabatan' => $attr['jabatan_id']
+        // ]);
+        // $this->sdm_model->update($find['id_sdm'], [
+        //     'sdm_jabatan' => null
+        // ]);
+        $check = $this->sdm_model->getByUserId($attr['user_id']);
+        $userPrev = $this->sdm_model->getByUserId($find['user_id']);
+        $this->sdm_model->update($userPrev['id'], [
+            'jabatan_id' => null
         ]);
-        $this->sdm_model->update($find['id_sdm'], [
-            'sdm_jabatan' => null
-        ]);
+        if ($check) {
+            $this->sdm_model->update($attr['user_id'], [
+                'jabatan_id' => $attr['jabatan_id']
+            ]);
+        } else {
+            $sdm = [
+                'user_id' => $attr['user_id'],
+                'jabatan_id' => $attr['jabatan_id'],
+                'unit_id' => $attr['unit_id'],
+                'created_by' => $attr['created_by'],
+                'updated_by' => $attr['updated_by'],
+                'kode' => $attr['kode']
+            ];
+            $this->sdm_model->create($sdm);
+        }
         $this->session->set_flashdata('message', '<div class="alert alert-success">Jabatan berhasil diupdate</div>');
         redirect('profile');
     }
@@ -111,7 +150,7 @@ class Profile extends Admin_Controller
         }
         $this->history_jabatan_model->destroy($id);
         $this->sdm_model->update($attr['sdm_id'], [
-            'sdm_jabatan' => null
+            'jabatan_id' => null
         ]);
         $this->session->set_flashdata('message', '<div class="alert alert-success">Jabatan berhasil dihapus</div>');
         redirect('profile');
@@ -119,14 +158,18 @@ class Profile extends Admin_Controller
 
     function validation($isUpdate = false)
     {
-        $this->form_validation->set_rules('sdm_id', 'SDM', 'required');
+        $this->form_validation->set_rules('user_id', 'SDM', 'required');
         $this->form_validation->set_rules('jabatan_id', 'Jabatan', 'required');
         $this->form_validation->set_rules('periode_id', 'Periode', 'required');
+        $this->form_validation->set_rules('unit_id', 'Unit', 'required');
         if ($this->form_validation->run() == false) {
             $this->session->set_flashdata('message', "<div class='alert alert-danger'>" . validation_errors() . "</div>");
             redirect('profile');
         }
-        $data = $this->input->post(['sdm_id', 'jabatan_id', 'periode_id']);
+        $data = $this->input->post(['user_id', 'jabatan_id', 'periode_id', 'unit_id']);
+        $user = $this->user_model->getProfile($data['user_id']);
+        $jabatan = $this->jabatan_model->get($data['jabatan_id']);
+        $data['kode'] = $jabatan['kode'] . '-' . ($user['nbm'] ?? 'N/A');
         // $data['is_active'] = $this->input->post('status') ?? false;
         if (!$isUpdate) {
             $data['created_by'] = $this->customlib->getStaffID();
