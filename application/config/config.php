@@ -1,6 +1,6 @@
 <?php
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 /*
   |--------------------------------------------------------------------------
@@ -26,8 +26,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 //$config['base_url'] = '';
 $config['base_url'] =  ((isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1) || isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') ?  "https" : "http");
-$config['base_url'] .=  "://".$_SERVER['HTTP_HOST'];
-$config['base_url'] .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT_NAME']);
+$config['base_url'] .=  "://" . $_SERVER['HTTP_HOST'];
+$config['base_url'] .=  str_replace(basename($_SERVER['SCRIPT_NAME']), "", $_SERVER['SCRIPT_NAME']);
 
 
 /*
@@ -105,7 +105,7 @@ $config['charset'] = 'UTF-8';
   | setting this variable to TRUE (boolean).  See the user guide for details.
   |
  */
-$config['enable_hooks'] = FALSE;
+$config['enable_hooks'] = true;
 
 /*
   |--------------------------------------------------------------------------
@@ -141,7 +141,8 @@ $config['subclass_prefix'] = 'MY_';
   | Note: This will NOT disable or override the CodeIgniter-specific
   |	autoloading (application/config/autoload.php)
  */
-$config['composer_autoload'] = FALSE;
+$config['composer_autoload'] = true;
+$config['composer_autoload'] = 'vendor/autoload.php';
 
 /*
   |--------------------------------------------------------------------------

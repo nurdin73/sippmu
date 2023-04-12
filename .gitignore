@@ -1,2 +1,5 @@
 /temp/
 /application/config/database.php
+vendor/*
+node_modules/*
+.env

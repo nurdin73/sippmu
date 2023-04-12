@@ -1,6 +1,6 @@
 <?php
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 /*
   | -------------------------------------------------------------------
@@ -59,8 +59,10 @@ $autoload['packages'] = array();
   |
   |	$autoload['libraries'] = array('user_agent' => 'ua');
  */
-$autoload['libraries'] = array('database', 'email','session', 'form_validation', 'upload', 'pagination', 'datatables',
-   'Customlib', 'Role', 'QDMailer','Adler32','Aes');
+$autoload['libraries'] = array(
+  'database', 'email', 'session', 'form_validation', 'upload', 'pagination', 'datatables',
+  'Customlib', 'Role', 'QDMailer', 'Adler32', 'Aes'
+);
 
 /*
   | -------------------------------------------------------------------
@@ -85,7 +87,7 @@ $autoload['drivers'] = array();
   |
   |	$autoload['helper'] = array('url', 'file');
  */
-$autoload['helper'] = array('url', 'file', 'menu', 'date','security','mysecurity','htmlpurifier');
+$autoload['helper'] = array('url', 'env', 'initial', 'file', 'menu', 'date', 'security', 'mysecurity', 'htmlpurifier');
 
 /*
   | -------------------------------------------------------------------
@@ -128,4 +130,4 @@ $autoload['language'] = array();
   |
   |	$autoload['model'] = array('first_model' => 'first');
  */
-$autoload['model'] = array('user_model','setting_model', 'admin_model', 'emailconfig_model','userlog_model','role_model','calendar_model','userroles_model','rolepermission_model','Module_model','cabang_model');
+$autoload['model'] = array('user_model', 'setting_model', 'admin_model', 'emailconfig_model', 'userlog_model', 'role_model', 'calendar_model', 'userroles_model', 'rolepermission_model', 'Module_model', 'cabang_model');

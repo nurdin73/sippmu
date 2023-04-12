@@ -1,8 +1,15 @@
 <?php
+
+use chriskacerguis\RestServer\RestController;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 define('THEMES_DIR', 'themes');
 define('BASE_URI', str_replace('index.php', '', $_SERVER['SCRIPT_NAME']));
+
+// require BASEPATH . '../vendor/autoload.php';
 
 class MY_Controller extends CI_Controller
 {
@@ -15,7 +22,7 @@ class MY_Controller extends CI_Controller
         parent::__construct();
         $this->load->library('auth');
         $this->load->library('module_lib');
-      
+
         $this->load->helper('directory');
         $this->load->model('setting_model');
         if ($this->session->has_userdata('admin')) {
@@ -36,7 +43,6 @@ class MY_Controller extends CI_Controller
 
         $this->load->language($lang_array, $language);
     }
-
 }
 
 class Admin_Controller extends MY_Controller
@@ -48,8 +54,6 @@ class Admin_Controller extends MY_Controller
         $this->auth->is_logged_in();
         $this->load->library('rbac');
     }
-
-
 }
 
 
@@ -60,7 +64,6 @@ class Public_Controller extends MY_Controller
     {
         parent::__construct();
     }
-
 }
 
 class Front_Controller extends CI_Controller
@@ -69,9 +72,58 @@ class Front_Controller extends CI_Controller
     public function __construct()
     {
         parent::__construct();
+    }
+}
 
+
+class Api_Controller extends RestController
+{
+    function __construct()
+    {
+        // Construct the parent class
+        parent::__construct();
     }
 
+    /**
+     * return response data
+     * @param array|string $response response or error data
+     * @param string|null $message message of response
+     * @param int $code http response
+     * @return json
+     */
 
+    public function returnResponse($response, $message = null, $code = 200)
+    {
+        if ($code === 200 || $code === 204) {
+            $this->response([
+                'status' => true,
+                'message' => $message,
+                'data' => $response
+            ], $code);
+        } else {
+            $this->response([
+                'status' => false,
+                'message' => $message,
+                'error' => $response
+            ]);
+        }
+    }
 
+    public function checkToken($token = null)
+    {
+        try {
+            if (!$token) {
+                $headers = getallheaders();
+                if (!isset($headers['Authorization'])) {
+                    throw new Exception("Unauthorized");
+                }
+                list(, $token) = explode(' ', $headers['Authorization']);
+            }
+            $decode = JWT::decode($token, new Key($_ENV['ACCESS_TOKEN_SECRET'], 'HS256'));
+            return $decode;
+        } catch (Exception $e) {
+            // $this->returnResponse($e->getMessage(), "Unauthorized", 403);
+            throw new Exception("Unauthorized");
+        }
+    }
 }
