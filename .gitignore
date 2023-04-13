@@ -3,3 +3,8 @@
 vendor/*
 node_modules/*
 .env
+
+.docker
+.backup
+.extjs
+docker-compose.yml
