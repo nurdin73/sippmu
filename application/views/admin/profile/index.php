@@ -424,7 +424,7 @@
                         type: "post",
                         url: "<?= base_url("sdm/updateStatus/") ?>" + id,
                         data: {
-                            status: status == 't' ? false : true
+                            status: (status == 't' || status == true) ? false : true
                         },
                         dataType: "json",
                         success: function(response) {
@@ -558,7 +558,7 @@
                 response.forEach(item => {
                     $('#organizations').append(`
                         <li title='(${item.kode}) ${item.nama}' style="cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="org-parent-${item.id}" class="org-parent">
-                            ${item.have_child == 't' ? `<button data-name="(${item.kode}) ${item.nama}" data-id="${item.id}" class='btn btn-xs btn-default'><i class='feather icon-chevron-right'></i></button>` : ''}
+                            ${(item.have_child == 't' || item.have_child == true) ? `<button data-name="(${item.kode}) ${item.nama}" data-id="${item.id}" class='btn btn-xs btn-default'><i class='feather icon-chevron-right'></i></button>` : ''}
                             <span class='mb-2' data-name="(${item.kode}) ${item.nama}" data-id="${item.id}">(${item.kode}) ${item.nama}</span>
                         </li>
                     `)
@@ -580,7 +580,7 @@
                     response.forEach(item => {
                         $('#organizations').append(`
                             <li title='(${item.kode}) ${item.nama}' style="cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="org-parent-${item.id}" class="org-parent">
-                                ${item.have_child == 't' ? `<button data-name="(${item.kode}) ${item.nama}" data-id="${item.id}" class='btn btn-xs btn-default'><i class='feather icon-chevron-right'></i></button>` : ''}
+                                ${(item.have_child == 't' || item.have_child == true) ? `<button data-name="(${item.kode}) ${item.nama}" data-id="${item.id}" class='btn btn-xs btn-default'><i class='feather icon-chevron-right'></i></button>` : ''}
                                 <span class='mb-2' data-name="(${item.kode}) ${item.nama}" data-id="${item.id}">(${item.kode}) ${item.nama}</span>
                             </li>
                         `)
@@ -589,7 +589,7 @@
                     var html = `<ul class='list-unstyled' style='margin-left: ${margin}px'>`;
                     response.forEach(item => {
                         html += `<li title='(${item.kode}) ${item.nama}' style="cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="org-parent-${item.id}" class="org-parent mb-2">
-                            ${item.have_child == 't' ? `<button data-name="(${item.kode}) ${item.nama}" data-id="${item.id}" class='btn btn-xs mb-2 btn-default'><i class='feather icon-chevron-right'></i></button>` : ''}
+                            ${(item.have_child == 't' || item.have_child == true) ? `<button data-name="(${item.kode}) ${item.nama}" data-id="${item.id}" class='btn btn-xs mb-2 btn-default'><i class='feather icon-chevron-right'></i></button>` : ''}
                             <span class='mb-2' data-name="(${item.kode}) ${item.nama}" data-id="${item.id}">(${item.kode}) ${item.nama}</span>
                         </li>`
                     })
@@ -660,7 +660,7 @@
                 {
                     data: null,
                     render: function(data) {
-                        if (data.is_active == 't') {
+                        if (data.is_active == 't' || data.is_active == true) {
                             return 'Aktif';
                         }
                         return 'Non Aktif';
@@ -671,7 +671,7 @@
                 {
                     data: null,
                     render: function(data) {
-                        return `<button class='btn btn-xs btn-status ${data.is_active == 't' ? 'btn-danger' : 'btn-success'}' data-status="${data.is_active}" data-id="${data.id}" data-kode="${data.kode}">${data.is_active == 't' ? 'Non aktifkan' : 'Aktifkan'}</button>`
+                        return `<button class='btn btn-xs btn-status ${(data.is_active == 't' || data.is_active == true) ? 'btn-danger' : 'btn-success'}' data-status="${data.is_active}" data-id="${data.id}" data-kode="${data.kode}">${(data.is_active == 't' || data.is_active == true) ? 'Non aktifkan' : 'Aktifkan'}</button>`
                     },
                     searchable: false,
                     orderable: false
