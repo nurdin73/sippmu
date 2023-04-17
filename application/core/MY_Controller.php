@@ -82,6 +82,8 @@ class Api_Controller extends RestController
     {
         // Construct the parent class
         parent::__construct();
+        $this->load->model('oauth_model');
+        $this->load->model('user_model');
     }
 
     /**
@@ -105,7 +107,7 @@ class Api_Controller extends RestController
                 'status' => false,
                 'message' => $message,
                 'error' => $response
-            ]);
+            ], $code);
         }
     }
 
@@ -119,8 +121,13 @@ class Api_Controller extends RestController
                 }
                 list(, $token) = explode(' ', $headers['Authorization']);
             }
-            $decode = JWT::decode($token, new Key($_ENV['ACCESS_TOKEN_SECRET'], 'HS256'));
-            return $decode;
+            $decode = JWT::decode($token, new Key(env('ACCESS_TOKEN_SECRET'), 'HS256'));
+            if (!$decode) throw new Exception("Unauthorized");
+            $getData = $this->oauth_model->getAccessToken($decode->jti, 'access_token');
+            if (!$getData) throw new Exception("Unauthorized");
+            $user = $this->user_model->getProfile($getData['user_id']);
+            unset($user['password']);
+            return $user;
         } catch (Exception $e) {
             // $this->returnResponse($e->getMessage(), "Unauthorized", 403);
             throw new Exception("Unauthorized");

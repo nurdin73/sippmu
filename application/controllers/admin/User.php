@@ -10,6 +10,7 @@ class User extends Admin_Controller
         $this->config->load("hejoe");
         $this->load->library('Enc_lib');
         $this->load->model("user_model");
+        $this->load->model('oauth_model');
         $this->status = $this->config->item('status');
 
         header("Cache-Control: no cache");
@@ -148,14 +149,22 @@ class User extends Admin_Controller
         $data['user_doc_id'] = $id;
         $data['user'] = $user_info;
         $data["status"] = $this->status;
-        $roles = $this->role_model->get();
-        $data["roles"] = $roles;
+        // $roles = $this->role_model->get();
+        // $data["roles"] = $roles;
 
         $userlist = $this->user_model->get();
         $data['userlist'] = $userlist;
 
+        $userRole = $this->user_model->getStaffRole();
+        $data["getStaffRole"] = $userRole;
+        $data["cabangs"] = $this->cabang_model->getCabang();
+        $genderList = $this->customlib->getGender();
+        $data['genderList'] = $genderList;
+        $data['apps'] = $this->oauth_model->getAllClients();
+        $data['permissions'] = $this->oauth_model->getPermissionClientByuserId($id);
+
         $this->load->view('layout/header', $data);
-        $this->load->view('admin/user/userprofile', $data);
+        $this->load->view('admin/user/detailuser', $data);
         $this->load->view('layout/footer', $data);
     }
 
@@ -285,6 +294,130 @@ class User extends Admin_Controller
         $results = $this->user_model->search($search, $unit);
         header('Content-Type: application/json');
         echo json_encode($results);
+    }
+
+    public function update($idx)
+    {
+        if (!$this->rbac->hasPrivilege('user', 'can_edit')) {
+            access_denied();
+        }
+        $a = 0;
+
+        $id = decrypt_url($idx);
+
+        $this->form_validation->set_rules('name', 'Name', "trim|required|xss_clean");
+        $this->form_validation->set_rules('username', 'Username', "trim|required|xss_clean");
+        $this->form_validation->set_rules('role', 'Role', 'trim|required|regex_match[/^[0-9]+$/]|xss_clean');
+        $this->form_validation->set_rules('phone', 'phone', 'trim|min_length[6]|max_length[15]|xss_clean');
+        $this->form_validation->set_rules('email', 'email', 'trim|valid_email|xss_clean');
+        $this->form_validation->set_rules('gender', 'Gender', 'trim|xss_clean');
+        $this->form_validation->set_rules('cabang', 'Cabang', 'trim|required|xss_clean');
+        $this->form_validation->set_rules('nbm', 'NBM', 'trim|required|xss_clean');
+
+        // $this->form_validation->set_rules(
+        //     'email',
+        //     'Email',
+        //     array(
+        //         'valid_email',
+        //         array('check_exists', array($this->user_model, 'valid_email_id'))
+        //     )
+        // );
+
+        if ($this->form_validation->run() == FALSE) {
+            $this->session->set_flashdata('message', "<div class='alert alert-danger'>" . validation_errors() . "</div>");
+            redirect("admin/user/profile/$idx");
+        }
+
+        $data = $this->input->post(['cabang', 'username', 'role', 'name', 'gender', 'phone', 'email', 'address', 'note', 'nbm']);
+
+        $user = $this->user_model->get($id);
+
+        if ($user['email'] != $data['email'] && $this->user_model->getByEmail($data['email'])) {
+            $this->session->set_flashdata('message', "<div class='alert alert-danger'>Email sudah ada!</div>");
+            redirect("admin/user/profile/$idx");
+        }
+
+        $data['id'] = $id;
+
+        if ($user["role_id"] == 7) {
+            $a = 0;
+            if ($userdata["email"] == $user["email"]) {
+                $a = 1;
+            }
+        } else {
+            $a = 1;
+        }
+
+        if ($a != 1) {
+            access_denied();
+        }
+        if (isset($_FILES["image"]) && !empty($_FILES['image']['name'])) {
+            $fileInfo = pathinfo($_FILES["image"]["name"]);
+            $img_name = $id . '.' . $fileInfo['extension'];
+            $path  = BASEPATH . "../uploads/user_images/" . $img_name;
+            if (!in_array($fileInfo['extension'], ['png', 'jpg', 'jpeg', 'gif', 'webp'])) {
+                $this->session->set_flashdata('message', "<div class='alert alert-danger'>Format file tidak sesuai!</div>");
+                redirect("admin/user/profile/$idx");
+            }
+            if (byteToMega($_FILES['image']['size']) > '2') {
+                $this->session->set_flashdata('message', "<div class='alert alert-danger'>File terlalu besar. silahkan pilih file maksimal 2MB!</div>");
+                redirect("admin/user/profile/$idx");
+            }
+            move_uploaded_file($_FILES["image"]["tmp_name"], $path);
+            $data['image'] = $img_name;
+        }
+        $roleData = [
+            'user_id' => $id,
+            'role_id' => $data['role']
+        ];
+        unset($data['role']);
+        $insert_id = $this->user_model->add($data);
+
+        // $role_data = array('user_id' => $id, 'role_id' => $data['role']);
+
+        $this->user_model->update_role($roleData);
+
+        $this->session->set_flashdata('message', '<div class="alert alert-success">Record Updated Successfully</div>');
+        redirect("admin/user/profile/$idx");
+    }
+
+    public function update_password($idx)
+    {
+        if (!$this->rbac->hasPrivilege('user', 'can_edit')) {
+            access_denied();
+        }
+
+        $id = decrypt_url($idx);
+
+        $this->form_validation->set_rules('password', 'Password', 'trim|required|xss_clean|matches[password_confirmation]');
+        $this->form_validation->set_rules('password_confirmation', 'Confirm password', 'trim|required|xss_clean');
+
+        if ($this->form_validation->run() == FALSE) {
+            $this->session->set_flashdata('message', "<div class='alert alert-danger'>" . validation_errors() . "</div>");
+            redirect("admin/user/profile/$idx");
+        }
+
+        $data = $this->input->post(['password']);
+        $data['id'] = $id;
+        $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+        $this->user_model->add($data);
+        $this->session->set_flashdata('message', '<div class="alert alert-success">Record Updated Successfully</div>');
+        redirect("admin/user/profile/$idx");
+    }
+
+    public function permission_app($idx)
+    {
+        $id = decrypt_url($idx);
+        $apps = $this->input->post('app');
+        if (count($apps) > 0) {
+            $this->oauth_model->removePermissionClientByUserId($id);
+            foreach ($apps as $app) {
+                $this->oauth_model->addPermissionClient($app, $id);
+            }
+        }
+
+        $this->session->set_flashdata('message', '<div class="alert alert-success">Record Updated Successfully</div>');
+        redirect("admin/user/profile/$idx");
     }
 
     function edit($idx)

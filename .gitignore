@@ -2,6 +2,7 @@
 /application/config/database.php
 vendor/*
 node_modules/*
+uploads/user_images/*
 .env
 
 .docker

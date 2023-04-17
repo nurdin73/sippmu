@@ -5,65 +5,69 @@ use Firebase\JWT\Key;
 
 class Auth extends Api_Controller
 {
-    protected function expires($additional = 0)
+    public function __construct()
     {
-        return time() + (env('EXPIRED_TOKEN') + $additional);
+        parent::__construct();
+        $this->load->model('oauth_model');
     }
 
     public function login_post()
     {
-        $email = $this->post('email');
-        if (!$email) $this->returnResponse(true, "Email Harus di isi", 422);
-        $payload = [
-            'email' => $email,
-            'exp' => $this->expires()
-        ];
+        $username = $this->post('username');
+        $password = $this->post('password');
+        $clientId = $this->post('client_id');
+        $clientSecret = $this->post('client_secret');
+        if (!$username) $this->returnResponse(true, "Username Harus di isi", 422);
+        if (!$password) $this->returnResponse(true, "Password Harus di isi", 422);
+        if (!$clientId) $this->returnResponse(true, "Client ID Harus di isi", 422);
+        if (!$clientSecret) $this->returnResponse(true, "Client secret Harus di isi", 422);
+        try {
+            $payload = [
+                'username' => $username,
+                'password' => $password,
+                'client_id' => $clientId,
+                'client_secret' => $clientSecret,
+            ];
 
-        $refreshPayload = [
-            'email' => $email,
-            'exp' => $this->expires(60 * 5)
-        ];
-
-        $accessToken = JWT::encode($payload, env('ACCESS_TOKEN_SECRET'), 'HS256');
-        $refreshToken = JWT::encode($refreshPayload, env('REFRESH_TOKEN_SECRET'), 'HS256');
-        setcookie("refresh", $refreshToken, $this->expires(60 * 5), '', '', false, true);
-        $this->returnResponse([
-            'access_token' => $accessToken,
-            'expired' => date(DATE_ATOM, $payload['exp']),
-        ]);
+            $attempt = $this->oauth_model->attempt($payload);
+            if ($attempt) {
+                $accessToken = $this->oauth_model->setAccessToken($payload['client_id'], $attempt['id']);
+                $refreshToken = $this->oauth_model->setRefreshToken($payload['client_id'], $attempt['id'], $accessToken['id']);
+                // setcookie("refresh", $refreshToken, $this->expires(60 * 5), '', '', false, true);
+                $this->returnResponse([
+                    'access_token' => $accessToken['token'],
+                    'refresh_token' => $refreshToken,
+                    'expires_at' => date(DATE_ATOM, $accessToken['exp'])
+                ]);
+            }
+            $this->returnResponse("Username atau password salah!", null, 403);
+        } catch (Exception $e) {
+            $this->returnResponse(true, $e->getMessage(), $e->getCode());
+        }
     }
 
     public function refresh_post()
     {
         $token = $this->post('token');
-        if (!$token) $this->returnResponse(true, "Refresh token tidak ditemukan", 422);
-        try {
-            $decode = $this->checkToken($token);
-            if ($decode) {
-                $this->returnResponse(null, "Token masih aktif. refresh token berhasil");
-            }
-        } catch (Exception $e) {
-            // $this->returnResponse(true, $e->getMessage(), 403);
-            $cookie = $_COOKIE["refresh"] ?? null;
-            if (!isset($cookie)) $this->returnResponse(null, "Token is expired!", 403);
-            $decodeRefresh = JWT::decode($cookie, new Key(env('REFRESH_TOKEN_SECRET'), 'HS256'));
-            if (!$decodeRefresh) $this->returnResponse(null, "Token is expired!", 403);
-            $payload = [
-                'email' => $decodeRefresh->email,
-                'exp' => $this->expires()
-            ];
-
-            $refreshPayload = [
-                'email' => $decodeRefresh->email,
-                'exp' => $this->expires(60 * 5)
-            ];
-            $newAccessToken = JWT::encode($payload, env('ACCESS_TOKEN_SECRET'), 'HS256');
-            $newRefreshToken = JWT::encode($refreshPayload, env('REFRESH_TOKEN_SECRET'), 'HS256');
-            setcookie('refresh', $newRefreshToken, $this->expires(60 * 5), '', '', false, true);
+        if (!$token) $this->returnResponse(true, "Token tidak ditemukan", 404);
+        $decode = $this->oauth_model->decodeToken($token, 'refresh_token');
+        if (!$decode) $this->returnResponse(true, "Token tidak ditemukan atau sudah kadaluarsa!", 404);
+        $data = $this->oauth_model->getRefreshToken($decode['jti']);
+        if (!$data) $this->returnResponse(true, "Token tidak ditemukan atau sudah kadaluarsa!", 404);
+        $accessToken = $this->oauth_model->getAccessToken($data['access_token_id'], 'id');
+        if (!$accessToken) $this->returnResponse(true, "Token tidak ditemukan atau sudah kadaluarsa!", 404);
+        if (strtotime($accessToken['expires_at']) < time()) {
+            $this->oauth_model->deleteAccessToken($accessToken['id']);
+            $accessToken = $this->oauth_model->setAccessToken($accessToken['client_id'], $accessToken['user_id']);
+            $refreshToken = $this->oauth_model->restoreRefreshToken($data['refresh_token'], $accessToken['id'], $data['client_id']);
+            // setcookie("refresh", $refreshToken, $this->expires(60 * 5), '', '', false, true);
             $this->returnResponse([
-                'access_token' => $newAccessToken,
-                'expired' => date(DATE_ATOM, $payload['exp']),
+                'access_token' => $accessToken['token'],
+                'refresh_token' => $refreshToken,
+                'expires_at' => date(DATE_ATOM, $accessToken['exp'])
             ]);
+        } else {
+            $this->returnResponse("Token masih aktif. Refresh token berhasil");
         }
     }
 

@@ -323,10 +323,9 @@
                                         <?php
                                         }
 
-                                        if ($this->rbac->hasPrivilege('master_program', 'can_view')) {
+                                        if ($this->rbac->hasPrivilege('master_clients', 'can_view')) {
                                         ?>
-                                            <!-- <li class="<?php echo set_Submenu('master/program'); ?>"><a href="<?php echo base_url(); ?>master/program"> <?php echo $this->lang->line('program'); ?></a></li> -->
-
+                                            <li class="<?php echo set_Submenu('master/clients'); ?>"><a href="<?php echo base_url(); ?>master/clients"> Clients</a></li>
                                         <?php
                                         }
                                         ?>
