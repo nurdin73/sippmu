@@ -3,17 +3,23 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
-class Auth2 extends Public_Controller {
+class Auth2 extends Public_Controller
+{
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
-        
+
         $this->load->model("user_model");
         $this->load->library('Auth');
+        $this->load->model('role_model');
+        $this->load->model('userroles_model');
         $this->load->library('Enc_lib');
+        $this->load->model('sdm_model');
     }
 
-    function login() {
+    function login()
+    {
 
         if ($this->auth->logged_in()) {
             $this->auth->is_logged_in(true);
@@ -34,43 +40,50 @@ class Auth2 extends Public_Controller {
             );
             $setting_result = $this->setting_model->get();
             $result = $this->user_model->checkLogin($login_post);
-           
+
 
             if ($result) {
-                if($result->is_active){
-                    $setting_result = $this->setting_model->get();
-                    $session_data = array(
-                        'id' => $result->id,
-                        'username' => $result->username,
-                        'name' => $result->name,
-                        'email' => $result->email,
-                        'roles' => $result->roles,
-                        'cabang' => $result->cabang,
-                        'cabang_name' => $result->cabang_name,
-                        'is_pusat' => $result->is_pusat,
-                        'date_format' => $setting_result[0]['date_format'],
-                        'currency_symbol' => $setting_result[0]['currency_symbol'],
-                        'app_name' => $setting_result[0]['name'],
-                        'timezone' => $setting_result[0]['timezone'],
-                        'sch_name' => $setting_result[0]['name'],
-                        'language' => array('lang_id' => $setting_result[0]['lang_id'], 'language' => $setting_result[0]['language']),
-                        'is_rtl' => $setting_result[0]['is_rtl'],
-                        'theme' => $setting_result[0]['theme'],
-                    );
-                    $this->session->set_userdata('admin', $session_data);
-                    $role = $this->customlib->getStaffRole();
-                    $role_name = json_decode($role)->name;
-                    $this->customlib->setUserLog($this->input->post('username'), $role_name);
+                $checkIsSdm = $this->sdm_model->getByUserId($result->id);
+                $checkRole = $this->userroles_model->getUserRoles($result->id);
+                $isAdminUnit = strtolower($checkRole[0]->name) == 'admin unit' ? true : false;
+                if ($checkIsSdm && !$isAdminUnit) {
+                    $data['error_message'] = 'Invalid Username or Password';
+                    $this->load->view('admin/login', $data);
+                } else {
+                    if ($result->is_active) {
+                        $setting_result = $this->setting_model->get();
+                        $session_data = array(
+                            'id' => $result->id,
+                            'username' => $result->username,
+                            'name' => $result->name,
+                            'email' => $result->email,
+                            'roles' => $result->roles,
+                            'cabang' => $result->cabang,
+                            'cabang_name' => $result->cabang_name,
+                            'is_pusat' => $result->is_pusat,
+                            'date_format' => $setting_result[0]['date_format'],
+                            'currency_symbol' => $setting_result[0]['currency_symbol'],
+                            'app_name' => $setting_result[0]['name'],
+                            'timezone' => $setting_result[0]['timezone'],
+                            'sch_name' => $setting_result[0]['name'],
+                            'language' => array('lang_id' => $setting_result[0]['lang_id'], 'language' => $setting_result[0]['language']),
+                            'is_rtl' => $setting_result[0]['is_rtl'],
+                            'theme' => $setting_result[0]['theme'],
+                        );
+                        $this->session->set_userdata('admin', $session_data);
+                        $role = $this->customlib->getStaffRole();
+                        $role_name = json_decode($role)->name;
+                        $this->customlib->setUserLog($this->input->post('username'), $role_name);
 
-                    if (isset($_SESSION['redirect_to']))
-                        redirect($_SESSION['redirect_to']);
-                    else
-                        redirect('dashboard');
-                }else{
-                     $data['error_message'] = 'Your account is disabled please contact to administrator';
-                      $this->load->view('admin/login', $data);
+                        if (isset($_SESSION['redirect_to']))
+                            redirect($_SESSION['redirect_to']);
+                        else
+                            redirect('dashboard');
+                    } else {
+                        $data['error_message'] = 'Your account is disabled please contact to administrator';
+                        $this->load->view('admin/login', $data);
+                    }
                 }
-               
             } else {
                 $data['error_message'] = 'Invalid Username or Password';
                 $this->load->view('admin/login', $data);
@@ -78,7 +91,8 @@ class Auth2 extends Public_Controller {
         }
     }
 
-    function logout() {
+    function logout()
+    {
         $admin_session = $this->session->userdata('admin');
         $this->auth->logout();
         if ($admin_session) {
@@ -88,7 +102,8 @@ class Auth2 extends Public_Controller {
         }
     }
 
-    function forgotpassword() {
+    function forgotpassword()
+    {
 
         $this->load->library('mailer');
         $this->mailer;
@@ -131,7 +146,8 @@ class Auth2 extends Public_Controller {
     }
 
     //reset password - final step for forgotten password
-    public function admin_resetpassword($verification_code = null) {
+    public function admin_resetpassword($verification_code = null)
+    {
         if (!$verification_code) {
             show_404();
         }
@@ -176,7 +192,8 @@ class Auth2 extends Public_Controller {
     }
 
 
-    function forgotPasswordBody($name, $resetPassLink) {
+    function forgotPasswordBody($name, $resetPassLink)
+    {
         //===============
         $subject = "Password Update Request";
         $body = 'Dear ' . $name . ', 
@@ -191,12 +208,9 @@ class Auth2 extends Public_Controller {
     }
 
 
-    
-    public function show_404() {
+
+    public function show_404()
+    {
         $this->load->view('errors/error_message');
     }
-
-    
 }
-
-?>
