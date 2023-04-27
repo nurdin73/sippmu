@@ -40,6 +40,9 @@ class Profile extends Admin_Controller
 
     public function histories($unit_id = null)
     {
+        if (!$this->rbac->hasPrivilege('profile', 'can_view')) {
+            access_denied();
+        }
         $results = $this->history_jabatan_model->all($unit_id);
         header('Content-Type: application/json');
         echo $results;

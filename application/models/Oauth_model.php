@@ -10,6 +10,7 @@ class Oauth_model extends CI_Model
     const OAUTH_REFRESH_TOKEN = 'oauth_refresh_tokens';
     const USER_PERMISSION = 'm_user_permissions';
     const USERS = 'users';
+    const SDM = 'm_sdm';
 
     public function __construct()
     {
@@ -125,6 +126,25 @@ class Oauth_model extends CI_Model
     }
 
     /**
+     * check is sdm
+     *
+     * @param integer $userId
+     * @return boolean
+     */
+    public function checkIsSdm(int $userId): bool
+    {
+        $this->db->from(self::SDM);
+        $this->db->where('user_id', $userId);
+        $query = $this->db->get();
+        // return $query->row_array();
+
+        if ($query->num_rows() == 1) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * check user
      *
      * @param array $credential
@@ -144,6 +164,12 @@ class Oauth_model extends CI_Model
         return false;
     }
 
+    /**
+     * check user attempt
+     *
+     * @param array $cred
+     * @return array|Exception
+     */
     public function attempt(array $cred)
     {
         // check credential client
@@ -151,6 +177,7 @@ class Oauth_model extends CI_Model
         // check user credential
         $user = $this->checkUser($cred);
         if (!$user) throw new Exception("Username or password not match!", 404);
+        if (!$this->checkIsSdm($user['id'])) throw new Exception("User is not registered as SDM", 404);
         // check permissions credential
         if (!$this->checkPermission($cred['client_id'], $user['id'])) throw new Exception("User dont have permission!", 403);
         unset($user['password']);

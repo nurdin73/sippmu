@@ -8,11 +8,12 @@ class User_model extends CI_Model
         parent::__construct();
     }
 
-    public function get($id = null)
+    public function get($id = null, $unitId = null)
     {
 
         $this->db->select('users.*,roles.name as user_type,roles.id as role_id')->from('users')->join("user_roles", "user_roles.user_id = users.id", "left")->join("roles", "user_roles.role_id = roles.id", "left");
 
+        if ($unitId) $this->db->where('users.cabang', $unitId);
 
         if ($id != null) {
             $this->db->where('users.id', $id);
@@ -495,5 +496,16 @@ class User_model extends CI_Model
         if ($filter) $this->db->where('name ilike', "%$filter%");
         $query = $this->db->get('users');
         return $query->result_array();
+    }
+
+    public function getUserByUnit($unitId)
+    {
+        $this->datatables->select("users.id, users.nbm, users.name, users.gender, roles.name as role, users.is_active");
+        $this->datatables->from("users");
+        $this->datatables->join("user_roles", "user_roles.user_id = users.id", "left");
+        $this->datatables->join("roles", "user_roles.role_id = roles.id", "left");
+        $this->datatables->where("users.cabang", $unitId);
+        $this->datatables->where("LOWER(roles.name) !=", 'super admin');
+        return $this->datatables->generate();
     }
 }
