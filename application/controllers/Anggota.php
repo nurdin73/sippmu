@@ -11,6 +11,9 @@ class Anggota extends Admin_Controller
 
     public function index()
     {
+        if (!$this->rbac->hasPrivilege('management_keanggotaan', 'can_view')) {
+            access_denied();
+        }
         $this->session->set_userdata('top_menu', 'Keanggotaan');
         $role = $this->customlib->getStaffRole();
 
