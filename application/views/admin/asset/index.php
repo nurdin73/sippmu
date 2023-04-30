@@ -25,16 +25,23 @@
             <a href="<?= base_url('asset/create') ?>" class="btn btn-success btn-sm">Tambah Asset</a>
         </div>
         <div class="table-responsive">
-            <table class="table table-striped" id="dt_table">
+            <table class="table table-striped table-bordered" id="dt_table">
                 <thead>
                     <tr>
-                        <th>Nama</th>
-                        <th>Unit</th>
-                        <th>Luas Tanah</th>
-                        <th>Perolehan</th>
-                        <th>Pendayagunaan</th>
-                        <th>Tanggal Dibuat</th>
-                        <th>Aksi</th>
+                        <th rowspan="2" class="align-middle text-center">Nama</th>
+                        <th rowspan="2" class="align-middle text-center">Unit</th>
+                        <th rowspan="2" class="align-middle text-center">Tipe Aset</th>
+                        <th colspan="2" class="text-center">Tanah</th>
+                        <th colspan="3" class="text-center">Bangunan</th>
+                        <th rowspan="2" class="align-middle text-center">Tanggal Dibuat</th>
+                        <th rowspan="2" class="align-middle text-center">Aksi</th>
+                    </tr>
+                    <tr>
+                        <th class="text-center">Luas</th>
+                        <th class="text-center">Perolehan</th>
+                        <th class="text-center">Luas</th>
+                        <th class="text-center">Jumlah Lokal</th>
+                        <th class="text-center">Pendayagunaan/pemanfaatan</th>
                     </tr>
                 </thead>
             </table>
@@ -95,6 +102,10 @@ function getAssets() {
                 data: "unit"
             },
             {
+                data: "tipe_aset",
+                searchable: false
+            },
+            {
                 data: null,
                 searchable: false,
                 orderable: false,
@@ -104,6 +115,22 @@ function getAssets() {
             },
             {
                 data: 'perolehan'
+            },
+            {
+                data: null,
+                searchable: false,
+                orderable: false,
+                render: function(data) {
+                    return data.luas_bangunan ? `${data.luas_bangunan} m<sup>2</sup>` : 'N/A'
+                }
+            },
+            {
+                data: null,
+                searchable: false,
+                orderable: false,
+                render: function(data) {
+                    return data.jml_lokal ?? 'N/A'
+                }
             },
             {
                 data: 'pendayagunaan'
@@ -143,8 +170,8 @@ function getAssets() {
                 "orderable": false, //set not orderable
             },
             {
-                "targets": [-1],
-                className: "text-right"
+                "className": "dt-center",
+                "targets": "_all"
             }
         ],
         buttons: [{

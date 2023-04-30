@@ -48,11 +48,24 @@
                 </select>
             </div>
             <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="luas_tanah">Luas tanah (m<sup>2</sup>) <sup class="text-danger">*</sup></label>
-                        <input type="number" name="luas_tanah" value="<?= $asset['luas_tanah'] ?>" id="luas_tanah"
-                            class="form-control">
+                <div class="col-md-6" id="form_luas">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="luas_tanah">Luas tanah (m<sup>2</sup>) <sup
+                                        class="text-danger">*</sup></label>
+                                <input type="number" name="luas_tanah" value="<?= $asset['luas_tanah'] ?>"
+                                    id="luas_tanah" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="luas_bangunan">Luas bangunan (m<sup>2</sup>) <sup
+                                        class="text-danger">*</sup></label>
+                                <input type="number" name="luas_bangunan" value="<?= $asset['luas_bangunan'] ?>"
+                                    id="luas_bangunan" class="form-control">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -129,8 +142,8 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="pendayagunaan">Pendayagunaan</label>
-                        <input type="text" value="<?= $asset['pendayagunaan'] ?>" name="pendayagunaan"
-                            class="form-control">
+                        <input type="text" id="pendayagunaan" value="<?= $asset['pendayagunaan'] ?>"
+                            name="pendayagunaan" class="form-control">
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -146,16 +159,22 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="nilai_njop">Nilai Tanah NJOP</label>
-                        <input type="number" name="nilai_njop" value="<?= $asset['nilai_njop'] ?>" class="form-control">
+                        <input type="number" id="nilai_njop" name="nilai_njop" value="<?= $asset['nilai_njop'] ?>"
+                            class="form-control">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="nilai_bangunan">Nilai Bangunan</label>
-                        <input type="number" value="<?= $asset['nilai_bangunan'] ?>" name="nilai_bangunan"
-                            class="form-control">
+                        <input type="number" id="nilai_bangunan" value="<?= $asset['nilai_bangunan'] ?>"
+                            name="nilai_bangunan" class="form-control">
                     </div>
                 </div>
+            </div>
+            <div class="form-group">
+                <label for="jml_lokal">Jumlah Lokal</label>
+                <input type="number" name="jml_lokal" value="<?= $asset['jml_lokal'] ?>" id="jml_lokal"
+                    class="form-control">
             </div>
             <div class="form-group" id="map" style="height: 500px;"></div>
             <div class="form-group">
@@ -179,10 +198,96 @@
 <script>
 $(document).ready(function() {
     const loc = ("<?= $asset['coord'] ?>").split(', ')
+    const typeAsset = "<?= $asset['tipe_aset'] ?>"
     generateMap("map", loc);
     getUnit();
     getPengelola();
+    dynamicForm()
+    typeForm(typeAsset)
 });
+
+function dynamicForm() {
+    // hide all form
+
+    $('#tipe_aset').on('change', function(e) {
+        /**
+         * TANAH
+         * - luas tanah
+         * - status tanah
+         * - jenis
+         * - perolehan
+         * - wakif perolehan
+         * - legalitas bhn
+         * - pendayagunaan
+         * - pengelola
+         * - nilai njop
+         * - nilai bangunan
+         * BANGUNAN
+         * - luas tanah
+         * - perolehan
+         * - luas bangunan
+         * - jml lokal
+         */
+        const val = e.target.value
+        typeForm(val);
+    })
+}
+
+function typeForm(val) {
+    const form_tanah = ['luas_tanah', 'status_tanah', 'jenis', 'perolehan', 'wakif_perolehan',
+        'legalitas_bhn', 'pendayagunaan', 'pengelola', 'nilai_njop', 'nilai_bangunan'
+    ];
+    const form_bangunan = ['luas_tanah', 'perolehan', 'luas_bangunan', 'jml_lokal', 'pendayagunaan'];
+    [...form_tanah, ...form_bangunan].forEach(val => {
+        $(`#${val}`).parent().hide();
+    })
+    if (val == 'TANAH') {
+        [...form_tanah, ...form_bangunan].forEach(val => {
+            $(`#${val}`).parent().hide();
+        })
+        form_tanah.forEach(el => {
+            if (el == 'luas_tanah') {
+                $(`#${el}`).parent().parent().removeClass('col-md-6').addClass('col-md-12')
+            }
+            if (el == 'perolehan') {
+                $(`#${el}`).parent().parent().removeClass('col-md-12').addClass('col-md-6')
+            }
+            if (el == 'pendayagunaan') {
+                $(`#${el}`).parent().parent().removeClass('col-md-12').addClass('col-md-6')
+            }
+            $(`#${el}`).parent().show();
+        })
+
+        $('#form_luas').removeClass('col-md-12').addClass('col-md-6')
+    } else if (val == 'GEDUNG') {
+        [...form_tanah, ...form_bangunan].forEach(val => {
+            $(`#${val}`).parent().hide();
+        })
+        form_bangunan.forEach(el => {
+            if (el == 'luas_tanah') {
+                $(`#${el}`).parent().parent().removeClass('col-md-12').addClass('col-md-6')
+            }
+            if (el == 'luas_bangunan') {
+                $(`#${el}`).parent().parent().removeClass('col-md-12').addClass('col-md-6')
+            }
+
+            if (el == 'perolehan') {
+                $(`#${el}`).parent().parent().removeClass('col-md-6').addClass('col-md-12')
+            }
+            if (el == 'pendayagunaan') {
+                $(`#${el}`).parent().parent().removeClass('col-md-6').addClass('col-md-12')
+            }
+            $(`#${el}`).parent().show();
+        })
+
+        $('#form_luas').removeClass('col-md-6').addClass('col-md-12')
+    } else {
+        [...form_tanah, ...form_bangunan].forEach(val => {
+            $(`#${val}`).parent().hide();
+        })
+        $('#form_luas').removeClass('col-md-6').addClass('col-md-12')
+    }
+}
 
 function getPengelola() {
     const option = new Option("<?= $asset['pengelola'] ?>", "<?= $asset['pengelola'] ?>", true, true)

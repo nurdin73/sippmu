@@ -7,7 +7,7 @@ class Asset_model extends CI_Model
 
     public function data()
     {
-        $this->datatables->select('a.id, a.name, c.nama as unit, a.luas_tanah, a.perolehan, a.pendayagunaan, a.created_at');
+        $this->datatables->select('a.id, a.name, c.nama as unit, a.tipe_aset, a.luas_tanah, a.luas_bangunan, a.jml_lokal, a.perolehan, a.pendayagunaan, a.created_at');
         $this->datatables->from("$this->table as a");
         $this->datatables->join("m_cabang as c", "c.id = a.unit_id", "left");
         $this->datatables->where('a.is_deleted', false);

@@ -14,6 +14,9 @@ class Profile extends Admin_Controller
 
     function index()
     {
+        if (!$this->rbac->hasPrivilege('profile', 'can_view')) {
+            access_denied();
+        }
         $this->session->set_userdata('top_menu', 'Profile');
         $role = $this->customlib->getStaffRole();
         $role_id = json_decode($role)->id;
@@ -60,7 +63,7 @@ class Profile extends Admin_Controller
 
     public function add()
     {
-        if (!$this->rbac->hasPrivilege('profile', 'can_view')) {
+        if (!$this->rbac->hasPrivilege('profile', 'can_create')) {
             access_denied();
         }
         $attr = $this->validation();
@@ -89,7 +92,7 @@ class Profile extends Admin_Controller
 
     function update($id)
     {
-        if (!$this->rbac->hasPrivilege('profile', 'can_view')) {
+        if (!$this->rbac->hasPrivilege('profile', 'can_edit')) {
             access_denied();
         }
         $attr = $this->validation(true);
@@ -144,7 +147,7 @@ class Profile extends Admin_Controller
 
     public function destroy($id)
     {
-        if (!$this->rbac->hasPrivilege('profile', 'can_view')) {
+        if (!$this->rbac->hasPrivilege('profile', 'can_delete')) {
             access_denied();
         }
         $attr = $this->history_jabatan_model->get($id);

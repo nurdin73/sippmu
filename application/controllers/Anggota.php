@@ -48,6 +48,9 @@ class Anggota extends Admin_Controller
 
     public function create()
     {
+        if (!$this->rbac->hasPrivilege('management_keanggotaan', 'can_create')) {
+            access_denied();
+        }
         $this->session->set_userdata('top_menu', 'Keanggotaan');
         $role = $this->customlib->getStaffRole();
 
@@ -78,7 +81,7 @@ class Anggota extends Admin_Controller
 
     public function insert()
     {
-        if (!$this->rbac->hasPrivilege('management_keanggotaan', 'can_view')) {
+        if (!$this->rbac->hasPrivilege('management_keanggotaan', 'can_create')) {
             access_denied();
         }
         $data = $this->validation();

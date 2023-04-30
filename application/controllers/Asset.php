@@ -2,6 +2,12 @@
 
 class Asset extends Admin_Controller
 {
+    const TANAH = [
+        'luas_tanah', 'status_tanah', 'jenis', 'perolehan', 'wakif_perolehan',
+        'legalitas_bhn', 'pendayagunaan', 'pengelola', 'nilai_njop', 'nilai_bangunan'
+    ];
+    const GEDUNG = ['luas_tanah', 'perolehan', 'luas_bangunan', 'jml_lokal', 'pendayagunaan'];
+
     public function __construct()
     {
         parent::__construct();
@@ -115,6 +121,9 @@ class Asset extends Admin_Controller
 
     public function update($id)
     {
+        if (!$this->rbac->hasPrivilege('management_asset', 'can_edit')) {
+            access_denied();
+        }
         $data = $this->validation(true, $id);
         $this->asset_model->update($id, $data);
         $this->session->set_flashdata('message', "<div class='alert alert-success'>Asset berhasil Diubah</div>");
@@ -123,6 +132,9 @@ class Asset extends Admin_Controller
 
     public function destroy($id)
     {
+        if (!$this->rbac->hasPrivilege('management_asset', 'can_delete')) {
+            access_denied();
+        }
         $this->asset_model->destroy($id);
         $this->session->set_flashdata('message', "<div class='alert alert-success'>Asset berhasil Dihapus</div>");
         redirect('asset');
@@ -143,7 +155,7 @@ class Asset extends Admin_Controller
         $this->form_validation->set_rules('tipe_aset', "Tipe aset", 'required');
         $this->form_validation->set_rules('luas_tanah', "Luas tanah", 'required|numeric');
         // $this->form_validation->set_rules('status_tanah', "Status tanah", 'required');
-        $this->form_validation->set_rules('jenis', "Jenis", 'required');
+        // $this->form_validation->set_rules('jenis', "Jenis", 'required');
         $this->form_validation->set_rules('nilai_njop', "Nilai NJOP", 'numeric');
         $this->form_validation->set_rules('nilai_bangunan', "Nilai Bangunan", 'numeric');
         $this->form_validation->set_rules('coord', "Koordinat", 'required');
@@ -158,16 +170,38 @@ class Asset extends Admin_Controller
             }
         }
 
-        $data = $this->input->post(['unit_id', 'luas_tanah', 'tipe_aset', 'status_tanah', 'jenis', 'perolehan', 'wakif_perolehan', 'legalitas_bhn', 'pendayagunaan', 'pengelola', 'nilai_njop', 'nilai_bangunan', 'alamat', 'coord']);
+        $data = $this->input->post(['unit_id', 'luas_tanah', 'tipe_aset', 'status_tanah', 'jenis', 'perolehan', 'wakif_perolehan', 'legalitas_bhn', 'pendayagunaan', 'pengelola', 'nilai_njop', 'nilai_bangunan', 'alamat', 'coord', 'jml_lokal', 'luas_bangunan']);
         $latLng = explode(', ', $data['coord']);
         $cabang = $this->cabang_model->getData($data['unit_id']);
-        $data['name'] = $data['tipe_aset'] . '-' . $cabang['kode'];
-        $data['latitude'] = $latLng[0];
-        $data['longitude'] = $latLng[1];
         unset($data['coord']);
         if ($isUpdate) {
             $data['updated_at'] = date('Y-m-d H:i:s');
         }
+        $unit = $data['unit_id'];
+        $tipeAsset = $data['tipe_aset'];
+        $alamat = $data['alamat'];
+        if ($tipeAsset == 'TANAH') {
+            foreach ($data as $key => $value) {
+                if (!in_array($key, self::TANAH)) {
+                    // unset($data[$key]);
+                    $data[$key] = null;
+                }
+            }
+        }
+        if ($tipeAsset == 'GEDUNG') {
+            foreach ($data as $key => $value) {
+                if (!in_array($key, self::GEDUNG)) {
+                    // unset($data[$key]);
+                    $data[$key] = null;
+                }
+            }
+        }
+        $data['unit_id'] = $unit;
+        $data['tipe_aset'] = $tipeAsset;
+        $data['name'] = $data['tipe_aset'] . '-' . $cabang['kode'];
+        $data['latitude'] = $latLng[0];
+        $data['longitude'] = $latLng[1];
+        $data['alamat'] = $alamat;
         return $data;
     }
 }

@@ -10,6 +10,9 @@ class Clients extends Admin_Controller
 
     public function index()
     {
+        if (!$this->rbac->hasPrivilege('master_clients', 'can_view')) {
+            access_denied();
+        }
         $this->session->set_userdata('top_menu', 'Master Clients');
         $role = $this->customlib->getStaffRole();
         $role_id = json_decode($role)->id;
@@ -34,6 +37,9 @@ class Clients extends Admin_Controller
 
     public function datatable()
     {
+        if (!$this->rbac->hasPrivilege('master_clients', 'can_view')) {
+            access_denied();
+        }
         $all = $this->oauth_model->getAll();
         header('Content-Type: application/json');
         echo $all;
@@ -41,6 +47,9 @@ class Clients extends Admin_Controller
 
     public function get($id)
     {
+        if (!$this->rbac->hasPrivilege('master_clients', 'can_view')) {
+            access_denied();
+        }
         $find = $this->oauth_model->get($id);
         if (!$find) header("HTTP/1.1 404 Not Found");
         if ($find) {
@@ -51,6 +60,9 @@ class Clients extends Admin_Controller
 
     public function insert()
     {
+        if (!$this->rbac->hasPrivilege('master_clients', 'can_add')) {
+            access_denied();
+        }
         $attr = $this->validation();
         $this->oauth_model->create($attr);
         $this->session->set_flashdata('message', '<div class="alert alert-success">Client berhasil dibuat</div>');
@@ -59,6 +71,9 @@ class Clients extends Admin_Controller
 
     public function update($id)
     {
+        if (!$this->rbac->hasPrivilege('master_clients', 'can_edit')) {
+            access_denied();
+        }
         $attr = $this->validation(true);
         $this->oauth_model->update($id, $attr);
         $this->session->set_flashdata('message', '<div class="alert alert-success">Client berhasil diubah</div>');
@@ -67,6 +82,9 @@ class Clients extends Admin_Controller
 
     public function delete($id)
     {
+        if (!$this->rbac->hasPrivilege('master_clients', 'can_delete')) {
+            access_denied();
+        }
         $this->oauth_model->destroy($id);
         $this->session->set_flashdata('message', '<div class="alert alert-success">Client berhasil dihapus</div>');
         redirect('master/clients');
@@ -74,9 +92,6 @@ class Clients extends Admin_Controller
 
     protected function validation($isUpdate = false)
     {
-        if (!$this->rbac->hasPrivilege('master_clients', 'can_view')) {
-            access_denied();
-        }
         $this->form_validation->set_rules('client_name', 'Nama', 'required');
         $this->form_validation->set_rules('redirect_uri', 'URL aplikasi', 'required');
         if ($this->form_validation->run() == false) {
