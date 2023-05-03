@@ -28,20 +28,14 @@
             <table class="table table-striped table-bordered" id="dt_table">
                 <thead>
                     <tr>
-                        <th rowspan="2" class="align-middle text-center">Nama</th>
-                        <th rowspan="2" class="align-middle text-center">Unit</th>
-                        <th rowspan="2" class="align-middle text-center">Tipe Aset</th>
-                        <th colspan="2" class="text-center">Tanah</th>
-                        <th colspan="3" class="text-center">Bangunan</th>
-                        <th rowspan="2" class="align-middle text-center">Tanggal Dibuat</th>
-                        <th rowspan="2" class="align-middle text-center">Aksi</th>
-                    </tr>
-                    <tr>
-                        <th class="text-center">Luas</th>
-                        <th class="text-center">Perolehan</th>
-                        <th class="text-center">Luas</th>
-                        <th class="text-center">Jumlah Lokal</th>
-                        <th class="text-center">Pendayagunaan/pemanfaatan</th>
+                        <th class="align-middle text-center">Nama</th>
+                        <th class="align-middle text-center">Unit</th>
+                        <th class="align-middle text-center">Tipe Aset</th>
+                        <th class="align-middle text-center">Perolehan</th>
+                        <th class="align-middle text-center">Jumlah Lokal</th>
+                        <th class="align-middle text-center">Pemanfaatan</th>
+                        <th class="align-middle text-center">Tanggal Dibuat</th>
+                        <th class="align-middle text-center">Aksi</th>
                     </tr>
                 </thead>
             </table>
@@ -106,23 +100,7 @@ function getAssets() {
                 searchable: false
             },
             {
-                data: null,
-                searchable: false,
-                orderable: false,
-                render: function(data) {
-                    return `${data.luas_tanah} m<sup>2</sup>`
-                }
-            },
-            {
                 data: 'perolehan'
-            },
-            {
-                data: null,
-                searchable: false,
-                orderable: false,
-                render: function(data) {
-                    return data.luas_bangunan ? `${data.luas_bangunan} m<sup>2</sup>` : 'N/A'
-                }
             },
             {
                 data: null,

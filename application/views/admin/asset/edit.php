@@ -23,18 +23,20 @@
 <div class="card">
     <div class="card-body">
         <?= $this->session->flashdata('message') ?>
-        <form action="<?= base_url('asset/update/') . $asset['id'] ?>" method="post">
+        <form action="<?= base_url('asset/update/') . $asset['id'] ?>" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="unit_id">Unit <sup class="text-danger">*</sup></label>
                 <select name="unit_id" id="unit_id" class="form-control">
                     <option value="">Pilih</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label for="tipe_aset">Tipe Aset <sup class="text-danger">*</sup></label>
-                <select name="tipe_aset" id="tipe_aset" class="form-control">
-                    <option value="">Pilih</option>
-                    <?php
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="tipe_aset">Tipe Aset <sup class="text-danger">*</sup></label>
+                        <select name="tipe_aset" id="tipe_aset" class="form-control">
+                            <option value="">Pilih</option>
+                            <?php
                     foreach ($tipe_aset as $ta) {
                         $selected = '';
                         if ($ta['name'] == $asset['tipe_aset']) {
@@ -45,10 +47,18 @@
                         echo "<option value='$ta[name]' $selected>$ta[name]</option>";
                     }
                     ?>
-                </select>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="sertifikat">Sertifikat (maksimal 2MB) <sup class="text-danger">*</sup></label>
+                        <input type="file" name="sertifikat" accept=".pdf" id="sertifikat">
+                    </div>
+                </div>
             </div>
             <div class="row">
-                <div class="col-md-6" id="form_luas">
+                <!-- <div class="col-md-6" id="form_luas">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -67,8 +77,8 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-6">
+                </div> -->
+                <div class="col-md-12">
                     <div class="form-group">
                         <label for="status_tanah">Status Tanah <sup class="text-danger">*</sup></label>
                         <select name="status_tanah" id="status_tanah" class="form-control">
@@ -171,10 +181,22 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group">
-                <label for="jml_lokal">Jumlah Lokal</label>
-                <input type="number" name="jml_lokal" value="<?= $asset['jml_lokal'] ?>" id="jml_lokal"
-                    class="form-control">
+            <div class="row">
+                <div class="col-md-10">
+                    <div class="form-group">
+                        <label for="jml_lokal">Jumlah Lokal</label>
+                        <input type="number" name="jml_lokal" value="<?= $asset['jml_lokal'] ?>" id="jml_lokal"
+                            class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="is_pusat">Kantor Pusat</label><br>
+                        <input type="checkbox" value="true" <?= $asset['is_pusat'] == 't' ? "checked='true'" : '' ?>
+                            name="is_pusat" id="is_pusat">
+                        Ya
+                    </div>
+                </div>
             </div>
             <div class="form-group" id="map" style="height: 500px;"></div>
             <div class="form-group">
@@ -234,10 +256,10 @@ function dynamicForm() {
 }
 
 function typeForm(val) {
-    const form_tanah = ['luas_tanah', 'status_tanah', 'jenis', 'perolehan', 'wakif_perolehan',
+    const form_tanah = ['status_tanah', 'jenis', 'perolehan', 'wakif_perolehan',
         'legalitas_bhn', 'pendayagunaan', 'pengelola', 'nilai_njop', 'nilai_bangunan'
     ];
-    const form_bangunan = ['luas_tanah', 'perolehan', 'luas_bangunan', 'jml_lokal', 'pendayagunaan'];
+    const form_bangunan = ['perolehan', 'jml_lokal', 'pendayagunaan', 'is_pusat'];
     [...form_tanah, ...form_bangunan].forEach(val => {
         $(`#${val}`).parent().hide();
     })

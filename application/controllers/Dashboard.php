@@ -1,19 +1,22 @@
 <?php
 
-class Dashboard extends Admin_Controller {
+class Dashboard extends Admin_Controller
+{
 
-    function __construct() {
+    function __construct()
+    {
         parent::__construct();
-
+        $this->load->model('sdm_model');
     }
 
-    function index() {
+    function index()
+    {
 
         $this->session->set_userdata('top_menu', 'dashboard');
         $role = $this->customlib->getStaffRole();
         $role_id = json_decode($role)->id;
         $userid = $this->customlib->getStaffID();
-        
+
         $tot_roles = $this->role_model->get();
         foreach ($tot_roles as $key => $value) {
             if ($value["id"] != 1) {
@@ -31,6 +34,10 @@ class Dashboard extends Admin_Controller {
         $this->load->view('layout/footer', $data);
     }
 
+    public function statistics($type = null, $periodeId = null)
+    {
+        $results = $this->sdm_model->statistics($type, $periodeId);
+        header('Content-Type: application/json');
+        echo json_encode($results);
+    }
 }
-
-?>

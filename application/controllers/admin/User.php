@@ -312,7 +312,7 @@ class User extends Admin_Controller
         $this->form_validation->set_rules('email', 'email', 'trim|valid_email|xss_clean');
         $this->form_validation->set_rules('gender', 'Gender', 'trim|xss_clean');
         $this->form_validation->set_rules('cabang', 'Cabang', 'trim|required|xss_clean');
-        $this->form_validation->set_rules('nbm', 'NBM', 'trim|required|xss_clean');
+        // $this->form_validation->set_rules('nbm', 'NBM', 'trim|required|xss_clean');
 
         // $this->form_validation->set_rules(
         //     'email',

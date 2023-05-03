@@ -131,6 +131,7 @@ function delete_recordById(url, Msg, isReload = '', datatableReload = '') {
 }
 
 const mapIcon = '<?= base_url("assets/images/map.svg") ?>';
+const BASE_URL = '<?= base_url("/") ?>';
     </script>
 
     </body>

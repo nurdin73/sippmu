@@ -39,43 +39,57 @@
     <script src="<?php echo base_url(); ?>assets/custom/jquery.min.js"></script>
     <script src="<?php echo base_url(); ?>assets/js/print.min.js"></script>
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+        integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+        integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
 
     <style>
-        .leaflet-popup-content-wrapper {
-            padding: 0;
-            overflow: hidden;
-        }
+    .leaflet-popup-content-wrapper {
+        padding: 0;
+        overflow: hidden;
+    }
 
-        .leaflet-popup-content-wrapper .leaflet-popup-content {
-            margin: 0;
-        }
+    .leaflet-popup-content-wrapper .leaflet-popup-content {
+        margin: 0;
+    }
 
-        .leaflet-popup-content-wrapper h4 {
-            padding: 16px;
-            background: #3570dc;
-            color: #ffffff;
-            font-size: 16px;
-        }
+    .leaflet-popup-content-wrapper h4 {
+        padding: 16px;
+        background: #3570dc;
+        color: #ffffff;
+        font-size: 16px;
+    }
 
-        .leaflet-popup-content-wrapper p {
-            padding: 0 16px;
-            font-size: 14px;
-            margin-bottom: 14px;
-        }
+    .leaflet-popup-content-wrapper p {
+        padding: 0 16px;
+        font-size: 14px;
+        margin-bottom: 14px;
+    }
 
-        .leaflet-popup-content-wrapper .leaflet-popup-content .phone-number {
-            padding: 16px;
-            padding-top: 0;
-        }
+    .leaflet-popup-content-wrapper .leaflet-popup-content .phone-number {
+        padding: 16px;
+        padding-top: 0;
+    }
 
-        .leaflet-popup-content-wrapper .leaflet-popup-content .phone-number a {
-            color: #dc3545;
-            font-size: 14px;
-            text-decoration: none;
-        }
+    .leaflet-popup-content-wrapper .leaflet-popup-content .phone-number a {
+        color: #dc3545;
+        font-size: 14px;
+        text-decoration: none;
+    }
+
+    .text-truncate {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .text-leatflet {
+        font-size: 13px;
+    }
     </style>
+
+    <link rel="stylesheet" href="<?= base_url('assets/css/leaflet-custom.css') ?>">
 </head>
 
 <body class="background-blue">
@@ -110,15 +124,19 @@
                         <img class="img-radius" src="<?php echo base_url() . $file; ?>" alt="User-Profile-Image">
                         <div class="user-details">
                             <div id="more-details"><?php echo $this->config->item('app_name_lite'); ?>
-                                <?php echo strtoupper($this->customlib->getSessionCabangName()); ?> <i class="fa fa-caret-down"></i></div>
+                                <?php echo strtoupper($this->customlib->getSessionCabangName()); ?> <i
+                                    class="fa fa-caret-down"></i></div>
                         </div>
                     </div>
                     <div class="collapse" id="nav-user-link">
                         <ul class="list-inline">
-                            <li class="list-inline-item"><a href="<?php echo base_url(); ?>myprofile" data-toggle="tooltip" title="View Profile"><i class="feather icon-user"></i></a>
+                            <li class="list-inline-item"><a href="<?php echo base_url(); ?>myprofile"
+                                    data-toggle="tooltip" title="View Profile"><i class="feather icon-user"></i></a>
                             </li>
                             <!-- <li class="list-inline-item"><a href="email_inbox.html"><i class="feather icon-mail" data-toggle="tooltip" title="Messages"></i><small class="badge badge-pill badge-primary">5</small></a></li> -->
-                            <li class="list-inline-item"><a href="<?php echo base_url(); ?>auth2/logout" data-toggle="tooltip" title="Logout" class="text-danger"><i class="feather icon-power"></i></a></li>
+                            <li class="list-inline-item"><a href="<?php echo base_url(); ?>auth2/logout"
+                                    data-toggle="tooltip" title="Logout" class="text-danger"><i
+                                        class="feather icon-power"></i></a></li>
                         </ul>
                     </div>
                 </div>
@@ -149,7 +167,8 @@
             <ul class="navbar-nav ml-auto">
 
                 <li class="nav-item top-org" style="">
-                    <img src="<?php echo base_url(); ?>assets/images/muhammadiyah-logo.jpg" height="28px" alt="" class="logo">
+                    <img src="<?php echo base_url(); ?>assets/images/muhammadiyah-logo.jpg" height="28px" alt=""
+                        class="logo">
                     <?php echo strtoupper($this->customlib->getSessionCabangName()); ?>
                 </li>
 
@@ -160,14 +179,17 @@
                         </a>
                         <div class="dropdown-menu dropdown-menu-right profile-notification">
                             <div class="pro-head">
-                                <img src="<?php echo base_url() . $file; ?>" class="img-radius" alt="User-Profile-Image">
+                                <img src="<?php echo base_url() . $file; ?>" class="img-radius"
+                                    alt="User-Profile-Image">
                                 <span><?php echo $this->customlib->getSessionName(); ?></span>
 
                             </div>
                             <ul class="pro-body">
-                                <li><a href="<?php echo base_url(); ?>myprofile" class="dropdown-item"><i class="feather icon-user"></i> Profile</a></li>
+                                <li><a href="<?php echo base_url(); ?>myprofile" class="dropdown-item"><i
+                                            class="feather icon-user"></i> Profile</a></li>
                                 <!-- <li><a href="email_inbox.html" class="dropdown-item"><i class="feather icon-mail"></i> My Messages</a></li> -->
-                                <li><a href="<?php echo base_url(); ?>auth2/logout" class="dropdown-item"><i class="feather icon-lock"></i> Logout</a></li>
+                                <li><a href="<?php echo base_url(); ?>auth2/logout" class="dropdown-item"><i
+                                            class="feather icon-lock"></i> Logout</a></li>
                             </ul>
                         </div>
                     </div>
