@@ -53,6 +53,18 @@
                                         }
                                 }
 
+                                if ($this->module_lib->hasActive('laporan')) {
+                                        if ($this->rbac->hasPrivilege('laporan', 'can_view')) {
+                                        ?>
+                        <li class="nav-item <?php echo set_Topmenu('laporan'); ?>"><a
+                                href="<?php echo base_url(); ?>laporan" class="nav-link "><span class="pcoded-micon"><i
+                                        class="feather icon-file-text"></i></span><span
+                                    class="pcoded-mtext">Laporan</span></a></li>
+
+                        <?php
+                                        }
+                                }
+
                                 if ($this->module_lib->hasActive('transaksi_kasir')) {
                                         if (
                                                 $this->rbac->hasPrivilege('trx_penerimaan', 'can_view') || $this->rbac->hasPrivilege('trx_pengeluaran', 'can_view') ||

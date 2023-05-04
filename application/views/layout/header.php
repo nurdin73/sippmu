@@ -84,6 +84,10 @@
         white-space: nowrap;
     }
 
+    .text-nowrap {
+        white-space: nowrap !important;
+    }
+
     .text-leatflet {
         font-size: 13px;
     }
